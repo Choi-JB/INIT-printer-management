@@ -5,11 +5,23 @@ import FirstView from '../views/FirstView'
 import SecondView from '../views/SecondView'
 import ThirdView from '../views/ThirdView'
 
+import DashboardPage from '../views/DashboardPage'
+import PurchasePage from '../views/PurchasePage'
+import ReleasePage from '../views/ReleasePage'
+import SalePage from '../views/SalePage'
+import SettingPage from '../views/SettingPage'
+
+
 // 라우터 설계
 const routes = [
     { path: '/1', component:FirstView},
     { path: '/2', component:SecondView},
-    { path: '/3', component:ThirdView}
+    { path: '/3', component:ThirdView},
+    { path: '/dashboard', component:DashboardPage},
+    { path: '/purchase', component:PurchasePage},
+    { path: '/release', component:ReleasePage},
+    { path: '/sale', component:SalePage},
+    { path: '/setting', component:SettingPage},
 ]
 
 // 라우터 생성

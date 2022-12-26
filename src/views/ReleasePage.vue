@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        first page
+        출고 
     </div>
 </template>
 <script>

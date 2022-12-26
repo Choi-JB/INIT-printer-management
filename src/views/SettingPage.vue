@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        third page
+        관리 설정 화면
     </div>
 </template>
 <script>

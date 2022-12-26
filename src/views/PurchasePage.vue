@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        second page
+        매입 페이지
     </div>
 </template>
 <script>
