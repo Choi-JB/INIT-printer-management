@@ -1,133 +1,138 @@
 <template lang="">
-    <v-card>
-    
-    
-    
-        <v-tabs v-model="tab" bg-color="primary">
-    
-    
-    
-            <v-tab v-for="i in menu" :key="i" :value="i" @click="state = i"> {{ i }}</v-tab>
-    
-    
-    
-        </v-tabs>
-    
-    
-    
-    
-    
-    
-    
-        <v-card-text>
-    
-    
-    
-            <v-card>
-    
-                <v-autocomplete 
-                    v-model="model"
-                    v-model:search="search"
-                    clearable label="출고 제품을 선택해주세요" 
-                    :items=stock
-                    :loading="isLoading"
-                    hide-no-data
-                    hide-selected
-                    item-title="Description"
 
-                    prepend-icon="mdi-database-search"
+        <v-radio-group
+      v-model="inline"
+      inline
+    >
+      <v-radio
+        label="출고"
+        value="출고"
+      ></v-radio>
+      <v-radio
+        label="임대"
+        value="임대"
+      ></v-radio>
+    </v-radio-group>
 
-                    variant="underlined"
+    <v-autocomplete
+  label="검색"
+  :items=stock
+></v-autocomplete>
 
-                >
-    
-                </v-autocomplete>
-    
-            </v-card>
-            <v-divider></v-divider>
-    
-    
-            <v-window v-model="tab">
-    
-    
-    
-                <v-window-item v-for="(a,i) in menu" :key="i" :value="a">
-    
-                    현재 {{ state}}화면
-    
-                    <v-expand-transition>
-    
-                        <div v-if="model">
-    
-                            <v-list color="red-lighten-3">
-                               
-                                {{ fields }}
-                                <!-- <v-list-item v-for="field in fields" :key="field">
-    
-                                    <v-list-item-header>
-    
-                                        <v-list-item-title>{{ field }}</v-list-item-title>
-    
-                                        <v-list-item-subtitle>{{ field }}</v-list-item-subtitle>
-    
-                                    </v-list-item-header>
-    
-                                </v-list-item> -->
-    
-                            </v-list>
-    
-                        </div>
-    
-                    </v-expand-transition>
-    
-    
-    
-    
-    
-    
-    
-                </v-window-item>
-    
-    
-    
-    
-    
-    
-    
-            </v-window>
-    
-    
-    
-        </v-card-text>
-    
-    
-    
-    </v-card>
+<v-text-field
+      label="개수"
+      hide-details="auto"
+    ></v-text-field>
+    <v-text-field label="고객처"></v-text-field>
+
+
+    <v-form v-model="valid">
+    <v-container>
+      <v-row>
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <v-text-field
+            v-model="year"
+            :rules="yearRules"
+            :counter="4"
+            label="년도"
+            required
+          ></v-text-field>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <v-text-field
+            v-model="month"
+            :rules="monthRules"
+            :counter="2"
+            label="월"
+            required
+          ></v-text-field>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <v-text-field
+            v-model="day"
+            :rules="dayRules"
+            label="일"
+            :counter="2"
+            required
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-btn
+      color="success"
+      class="mr-4"
+      @click="validate"
+    >
+      입력
+    </v-btn>
+
+    <v-btn
+      color="error"
+      class="mr-4"
+      @click="reset"
+    >
+      초기화
+    </v-btn>
+  </v-form>
+
+
+
 </template>
 <script>
 export default {
     data: () => ({
-        tab: null,
+        // radio-button
+        column: null,
+        inline: null,
+
         state: "출고",
         menu: ["출고", "임대"],
         text: ["1", "2"],
 
-        descriptionLimit: 60,
-        entries: [],
-        isLoading: false,
-        model: null,
-        search: null,
+     
 
         client: ['삼보', '한국OSG'],
-        stock: ['M5526', 'FS-2100', 'P3145dn'],
+        stock: ['M5526', 'FS-2100', 'P3145dn','TK-5244KK'],
 
         item: {
             name: '',
             count: 0,
             memo: '',
             client: '',
-        }
+        },
+
+        valid: false,
+      
+        year:'',
+        yearRules:[
+            v => !!v || '년도를 입력해주세요',
+            v => (v && v.length == 4)
+        ],
+        month:'',
+        monthRules:[
+            v => !!v || '몇월인지 입력해주세요',
+            v => (v && v.length <= 2)
+        ],
+        day:'',
+        dayRules:[
+            v => !!v || '며칠인지 입력해주세요',
+            v => (v && v.length <= 2) || (v<=31)
+        ],
+
     }),
+
     computed: {
         fields() {
             if (!this.model) return []
@@ -140,7 +145,9 @@ export default {
                 }
             })
         }
-    }
+    },
+
+    
 };
 </script>
 <style lang="">
