@@ -86,6 +86,12 @@ export default {
         title: "history",
         icon: "mdi-history",
       },
+      {
+        name: "입력test",
+        link: "./input",
+        title: "input",
+        icon: "mdi-cog",
+      }
     ],
 
     // icon :
