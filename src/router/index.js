@@ -11,6 +11,7 @@ import Input from '../views/InputPage'
 
 // 라우터 설계
 const routes = [
+    { path: '/', component: DashboardPage},     //기본 첫 페이지
     { path: '/dashboard', component:DashboardPage},
     { path: '/purchase', component:PurchasePage},
     { path: '/release', component:ReleasePage},

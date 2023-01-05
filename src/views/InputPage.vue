@@ -54,7 +54,10 @@
 
           <!-- 날짜선택 -->
           <v-col cols="12" md="6">
-            날짜 선택 창
+            <DatePicker v-model="date" @click="showDate()"  :max-date="new Date()" :data="masks"/>
+            <!--@click="showDate()"  -->
+            <p v-if="selectDate!='1970-01-01'">{{selectDate}}</p>
+            <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
           </v-col>
 
           <!-- 거래처 / 개수 입력 -->
@@ -125,9 +128,22 @@
     </div>
 </template>
 <script>
+import { DatePicker } from 'v-calendar';
+
+import 'v-calendar/dist/style.css';
+
 export default {
+    components:{
+      DatePicker
+    },
     data(){
         return{
+            date : new Date(),
+            selectDate: new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date()),
+            masks:{
+              input: 'YYYY-MM-DD'
+            },
+            
             select: '출고',
             menu:[
                 '출고',
@@ -184,8 +200,13 @@ export default {
       },
       reset () {
         this.$refs.form.reset()
+        this.selectDate = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date());
       },
-
+      showDate(){
+        var new_date = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(this.date);
+        this.selectDate = new_date;
+        console.log(new_date)
+      }
     },
         
 }
