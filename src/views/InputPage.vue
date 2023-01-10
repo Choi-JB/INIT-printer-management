@@ -68,6 +68,7 @@
               variant="filled"
               color="blue-grey-lighten-2"
               label="거래처"
+              :rules="client_rule"
             ></v-text-field>
             <v-text-field
               v-model="count"
@@ -84,7 +85,7 @@
               :disabled="isUpdating"
               color="blue-grey-lighten-2"
               label="단가"
-              
+              :rules="price_rule"
             ></v-text-field>
 
           </v-col>
@@ -113,7 +114,7 @@
         <v-btn
             variant="flat"
             color="success"
-            @click="validate"
+            @click="dialog=true"
         >
             입력
             </v-btn>
@@ -124,6 +125,25 @@
 
     </v-form>
     </v-card>
+
+    <v-dialog 
+      v-if="dialog==true"
+      v-model="dialog"
+    >
+      <v-card>
+        <v-card-text>
+          입력한 값이 맞습니까? 
+          <br>
+          {{selectDate}} | {{select}} | {{client}} | {{product}} | {{count}} | {{price}}
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="success" block @click="dialog = false">네</v-btn>
+        </v-card-actions>
+        <v-card-actions>
+          <v-btn color="error" block @click="dialog = false">아니오</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     </div>
 </template>
@@ -143,7 +163,7 @@ export default {
             masks:{
               input: 'YYYY-MM-DD'
             },
-            
+            dialog:false,
             select: '출고',
             menu:[
                 '출고',
@@ -170,10 +190,18 @@ export default {
            
             ],
 
-            client:'',
+            client:null,
+            client_rule:[
+              v => !!v || '거래처는 필수 입력사항입니다.',
+              
+            ] ,
 
-            count:null,
-            price:null,
+            count:1,
+            price:0,
+            price_rule:[
+              v => !(v==0)||'단가를 확인해 주세요.'
+              
+            ] ,
 
 
         }
@@ -206,6 +234,9 @@ export default {
         var new_date = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(this.date);
         this.selectDate = new_date;
         console.log(new_date)
+      },
+      sendData(){
+
       }
     },
         
