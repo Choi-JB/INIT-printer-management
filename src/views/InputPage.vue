@@ -127,21 +127,34 @@
     </v-card>
 
     <v-dialog 
-      v-if="dialog==true"
       v-model="dialog"
+      persistent
+      absolute
     >
       <v-card>
-        <v-card-text>
+        <v-row justify="center">
+          
+        <v-card-text class="text-h6" >
           입력한 값이 맞습니까? 
           <br>
+          <p class="text-xs-center">
           {{selectDate}} | {{select}} | {{client}} | {{product}} | {{count}} | {{price}}
+        </p>
         </v-card-text>
+        </v-row>
+        <v-row justify="center">
+          <v-col cols="12" md="6">
+        
         <v-card-actions>
           <v-btn color="success" block @click="[dialog = false, sendData()]">네</v-btn>
         </v-card-actions>
+      </v-col>
+      <v-col cols="12" md="6">
         <v-card-actions>
           <v-btn color="error" block @click="dialog = false">아니오</v-btn>
         </v-card-actions>
+      </v-col>
+        </v-row>
       </v-card>
     </v-dialog>
 
