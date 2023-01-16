@@ -137,7 +137,7 @@
           {{selectDate}} | {{select}} | {{client}} | {{product}} | {{count}} | {{price}}
         </v-card-text>
         <v-card-actions>
-          <v-btn color="success" block @click="dialog = false">네</v-btn>
+          <v-btn color="success" block @click="[dialog = false, sendData()]">네</v-btn>
         </v-card-actions>
         <v-card-actions>
           <v-btn color="error" block @click="dialog = false">아니오</v-btn>
@@ -151,6 +151,8 @@
 import { DatePicker } from 'v-calendar';
 
 import 'v-calendar/dist/style.css';
+import axios from "axios";
+
 
 export default {
     components:{
@@ -236,7 +238,20 @@ export default {
         console.log(new_date)
       },
       sendData(){
-
+          axios.get('localhost:3000' + '/input',{
+            data: {
+              date: this.selectDate,
+              type: this.select,
+              client: this.client,
+              count: this.count,
+              price: this.price,
+          }
+          }).then(()=>{
+            alert('입력 성공!');
+          }).catch((err)=>{
+            console.log(err);
+            alert(err);
+          })
       }
     },
         
