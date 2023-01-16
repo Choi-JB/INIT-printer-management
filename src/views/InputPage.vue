@@ -251,7 +251,7 @@ export default {
         console.log(new_date)
       },
       sendData(){
-          axios.get('localhost:3000' + '/input',{
+          axios.get('http://192.168.0.9:3000/input',{
             data: {
               date: this.selectDate,
               type: this.select,
