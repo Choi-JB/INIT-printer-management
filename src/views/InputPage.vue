@@ -255,11 +255,12 @@ export default {
 
           axios.post('http://localhost:3000/input', 
             { params:{
-              date: this.selectDate,
-              type: this.select,
-              client: this.client,
-              count: this.count,
-              price: this.price,
+                date: this.selectDate,
+                type: this.select,
+                product: this.product,
+                client: this.client,
+                count: this.count,
+                price: this.price,
             }
           }).then((res)=>{
             console.log(res);
