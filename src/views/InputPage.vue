@@ -212,7 +212,7 @@ export default {
             ] ,
 
             count:1,
-            price:0,
+            price:null,
             price_rule:[
               v => !(v==0)||'단가를 확인해 주세요.'
               
@@ -251,19 +251,24 @@ export default {
         console.log(new_date)
       },
       sendData(){
-          axios.get('http://192.168.0.9:3000/input',{
-            data: {
+        
+
+          axios.post('http://localhost:3000/input', 
+            { params:{
               date: this.selectDate,
               type: this.select,
               client: this.client,
               count: this.count,
               price: this.price,
-          }
-          }).then(()=>{
-            alert('입력 성공!');
+            }
+          }).then((res)=>{
+            console.log(res);
+            alert("success!")
           }).catch((err)=>{
             console.log(err);
             alert(err);
+          }).finally(()=>{
+            //console.log("항상 마지막에 실행");
           })
       }
     },
