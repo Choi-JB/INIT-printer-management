@@ -33,6 +33,7 @@
             <v-col cols="12">
             <v-autocomplete
               v-model="product"
+              :loading="loading"
               :disabled="isUpdating"
               :items="productList"
               variant="filled"
@@ -40,6 +41,7 @@
               label="제품"
               item-title="product"
               item-value="product"
+              @click="getList('product')"
             >
             <template v-slot:item="{ props, item }">
                 <v-list-item v-if="typeof item.raw !== 'object'" v-bind="props"></v-list-item>
@@ -165,6 +167,7 @@ import { DatePicker } from 'v-calendar';
 
 import 'v-calendar/dist/style.css';
 import axios from "axios";
+import {ip} from '../router/ip';
 
 
 export default {
@@ -178,7 +181,11 @@ export default {
             masks:{
               input: 'YYYY-MM-DD'
             },
+
+            //입력 후 마지막 확인창 on/off
             dialog:false,
+
+            //현재 선택한 메뉴
             select: '출고',
             menu:[
                 '출고',
@@ -187,6 +194,7 @@ export default {
                 '입고',
             ],
 
+            //상품명
             product:'',
             productList:[
                 {
@@ -204,13 +212,16 @@ export default {
                 },
            
             ],
-
+              
+            //거래처
             client:null,
             client_rule:[
               v => !!v || '거래처는 필수 입력사항입니다.',
               
             ] ,
+            clientList:[],
 
+            //개수, 단가
             count:1,
             price:null,
             price_rule:[
@@ -228,10 +239,11 @@ export default {
                 setTimeout(() => (this.isUpdating = false), 3000)
                 }
             },
-
+           
        },
 
     methods: {
+      
       remove (item) {
         const index = this.friends.indexOf(item.name)
         if (index >= 0) this.friends.splice(index, 1)
@@ -241,18 +253,19 @@ export default {
 
         if (valid) alert('Form is valid')
       },
+      //입력폼 모두 초기화
       reset () {
         this.$refs.form.reset()
         this.selectDate = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date());
       },
+      //달력 선택한 날짜 표기
       showDate(){
         var new_date = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(this.date);
         this.selectDate = new_date;
         console.log(new_date)
       },
+      //입력한 내용 제출
       sendData(){
-        
-
           axios.post('http://localhost:3000/input', 
             { params:{
                 date: this.selectDate,
@@ -271,7 +284,18 @@ export default {
           }).finally(()=>{
             //console.log("항상 마지막에 실행");
           })
-      }
+      },
+      //상품리스트, 거래처 리스트 가져오기
+      getList(type){
+        axios.get(ip + "/list", {params:{list:type}}).then((res)=>{
+          if(type=="product"){
+            this.productList = res.data;
+          } else if(type=="client"){
+            this.clientList = res.data;
+          }
+        })
+      },
+
     },
         
 }
