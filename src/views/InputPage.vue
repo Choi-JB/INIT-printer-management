@@ -41,7 +41,7 @@
               label="제품"
               item-title="product"
               item-value="product"
-              @click="getList('product')"
+              @click="getList('Product')"
             >
             <template v-slot:item="{ props, item }">
                 <v-list-item v-if="typeof item.raw !== 'object'" v-bind="props"></v-list-item>
@@ -266,7 +266,7 @@ export default {
       },
       //입력한 내용 제출
       sendData(){
-          axios.post('http://localhost:3000/input', 
+          axios.post(ip + "/input", 
             { params:{
                 date: this.selectDate,
                 type: this.select,
@@ -287,12 +287,16 @@ export default {
       },
       //상품리스트, 거래처 리스트 가져오기
       getList(type){
-        axios.get(ip + "/list", {params:{list:type}}).then((res)=>{
-          if(type=="product"){
+        //console.log(type);
+        axios.get(ip + "/list", {params:{type}}).then((res)=>{
+          if(type=="Product"){
             this.productList = res.data;
-          } else if(type=="client"){
+            alert(res)
+            //console.log(res);
+          } else if(type=="Client"){
             this.clientList = res.data;
           }
+
         })
       },
 
