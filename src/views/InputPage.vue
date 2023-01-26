@@ -48,7 +48,7 @@
                 <v-list-item
                   v-else
                   v-bind="props"
-                  :title="item.raw.product"
+                  :title="item.raw"
                 ></v-list-item>
               </template>
             </v-autocomplete>
@@ -147,6 +147,7 @@
         <v-row justify="center">
           <v-col cols="12" md="6">
         
+        <!-- 입력값 전송 -->
         <v-card-actions>
           <v-btn color="success" block @click="[dialog = false, sendData()]">네</v-btn>
         </v-card-actions>
@@ -176,6 +177,7 @@ export default {
     },
     data(){
         return{
+          //선택한 날짜 데이터 포맷
             date : new Date(),
             selectDate: new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date()),
             masks:{
@@ -197,20 +199,7 @@ export default {
             //상품명
             product:'',
             productList:[
-                {
-                    type:'복합기',
-                    mfr:'kyocera',
-                    product:'M5526',
-                    price:'300000'
-                },
-                {
-                    type:'토너',
-                    mfr:'kyocera',
-                    product:'TK-5244K',
-                    price:'18000',
-                    comp:''
-                },
-           
+
             ],
               
             //거래처
@@ -285,16 +274,30 @@ export default {
             //console.log("항상 마지막에 실행");
           })
       },
+      
       //상품리스트, 거래처 리스트 가져오기
       getList(type){
-        //console.log(type);
         axios.get(ip + "/list", {params:{type}}).then((res)=>{
+
+          let list = [];
+          //DB에서 가져온 행들에서 이름만 분리
+          for(var idx in res.data){
+            console.log(res.data[idx]);
+
+            //예외처리 
+            if(res.data[idx].type=="급지롤러"){
+              console.log(res.data[idx].type);
+              list.push(res.data[idx].name + '(' + res.data[idx].note + ')');
+            } else{
+              list.push(res.data[idx].name);
+            }
+          }
+          this.productList = list;
+
           if(type=="Product"){
-            this.productList = res.data;
-            alert(res)
-            //console.log(res);
+            this.productList = [...list];
           } else if(type=="Client"){
-            this.clientList = res.data;
+            this.clientList = [...list];
           }
 
         })
