@@ -36,19 +36,20 @@
               :loading="loading"
               :disabled="isUpdating"
               :items="productList"
+              :custom-filter="productFilter"
               variant="filled"
               color="blue-grey-lighten-2"
               label="제품"
-              item-title="product"
-              item-value="product"
+              item-title="name"
+              item-value="name"
               @click="getList('Product')"
+              
             >
             <template v-slot:item="{ props, item }">
-                <v-list-item v-if="typeof item.raw !== 'object'" v-bind="props"></v-list-item>
                 <v-list-item
-                  v-else
                   v-bind="props"
-                  :title="item.raw"
+                  :title="item?.raw?.name"
+                  :subtitle="item?.raw?.note"
                 ></v-list-item>
               </template>
             </v-autocomplete>
@@ -62,16 +63,31 @@
             <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
           </v-col>
 
-          <!-- 거래처 / 개수 입력 -->
+          <!-- 거래처 입력 -->
           <v-col cols="12" md="6">
-            <v-text-field
+            <v-autocomplete
               v-model="client"
+              :loading="loading"
               :disabled="isUpdating"
+              :items="clientList"
+              
               variant="filled"
               color="blue-grey-lighten-2"
               label="거래처"
-              :rules="client_rule"
-            ></v-text-field>
+              item-title="name"
+              item-value="name"
+              @click="getList('Client')"
+            >
+            <template v-slot:item="{ props, item }">
+                <v-list-item
+                  v-bind="props"
+                  :title="item?.raw?.name"
+                  :subtitle="item?.raw?.type"
+                ></v-list-item>
+              </template>
+            </v-autocomplete>
+
+             <!-- 개수 입력 -->
             <v-text-field
               v-model="count"
               type="number"
@@ -194,6 +210,7 @@ export default {
                 '매입',
                 '판매',
                 '입고',
+                '사무실사용'
             ],
 
             //상품명
@@ -253,6 +270,19 @@ export default {
         this.selectDate = new_date;
         console.log(new_date)
       },
+      //productList 필터
+      productFilter(item, queryText){
+        const textOne = item.name.toLowerCase()
+        const searchText = queryText.toLowerCase()
+
+        return textOne.indexOf(searchText) > -1 
+      },
+      
+      //제품 선택 시 단가 자동입력
+      setPrice(){
+
+      },
+
       //입력한 내용 제출
       sendData(){
           axios.post(ip + "/input", 
@@ -279,25 +309,26 @@ export default {
       getList(type){
         axios.get(ip + "/list", {params:{type}}).then((res)=>{
 
-          let list = [];
-          //DB에서 가져온 행들에서 이름만 분리
-          for(var idx in res.data){
-            console.log(res.data[idx]);
+          //  //DB에서 가져온 행들에서 이름만 분리
+          // let list = [];
+          // for(var idx in res.data){
+          //   console.log(res.data[idx]);
 
-            //예외처리 
-            if(res.data[idx].type=="급지롤러"){
-              console.log(res.data[idx].type);
-              list.push(res.data[idx].name + '(' + res.data[idx].note + ')');
-            } else{
-              list.push(res.data[idx].name);
-            }
-          }
-          this.productList = list;
-
+          //   //예외처리 
+          //   if(res.data[idx].type=="급지롤러"){
+          //     console.log(res.data[idx].type);
+          //     list.push(res.data[idx].name + '(' + res.data[idx].note + ')');
+          //   } else{
+          //     list.push(res.data[idx].name);
+          //   }
+          // }
+          // this.productList = list;
+        
+          
           if(type=="Product"){
-            this.productList = [...list];
+            this.productList = [...res.data];
           } else if(type=="Client"){
-            this.clientList = [...list];
+            this.clientList = [...res.data];
           }
 
         })

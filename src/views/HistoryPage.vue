@@ -6,28 +6,25 @@
     <thead>
       <tr>
         <th class="text-left">
-          날짜
-        </th>
-        <th class="text-left">
           구분
         </th>
         <th class="text-left">
-          어디에
+          날짜
+        </th>
+        <th class="text-left">
+          거래처
         </th>
         <th class="text-left">
           품명
         </th>
         <th class="text-left">
-          개수
-        </th>
-        <th class="text-left">
           단가
         </th>
         <th class="text-left">
-          총액
+          개수
         </th>
         <th class="text-left">
-          
+          총액
         </th>
       </tr>
     </thead>
@@ -36,51 +33,66 @@
         v-for="item in history"
         :key="item"
       >
-        <td>{{ item.date }}</td>
         <td>{{ item.type }}</td>
-        <td>{{ item.where }}</td>
-        <td>{{ item.what }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.client }}</td>
+        <td>{{ item.product }}</td>
+        <td>{{ item.price.toLocaleString('ko-KR') }}</td>
         <td>{{ item.count }}</td>
-        <td>{{ item.unit_price }}</td>
-        <td>{{ item.total }}</td>
-        <td>  <v-icon
-      size="large"
-      color="red"
-    >
-      mdi-close
-    </v-icon> </td>
+        <td>{{ item.total.toLocaleString('ko-KR') }}</td>
       </tr>
     </tbody>
   </v-table>
 </template>
 <script>
+import axios from "axios";
+import {ip} from '../router/ip';
+
 export default {
     data () {
         return {
             history:[
                 {
-                    date:'2022-08-23',
+                    id:'1',
                     type:'매입',
-                    where:'한별시스템',
-                    what:'TK-5244Y',
+                    date:'2022-08-23',
+                    client:'한별시스템',
+                    product:'TK-5244Y',
+                    price: 18000,
                     count: 5,
-                    unit_price: 18000,
                     total: 90000
                 },
                 {
-                    date:'2022-08-23',
+                    id:'2',
                     type:'출고',
-                    where:'삼보',
-                    what:'TK-164K',
+                    date:'2022-08-23',
+                    client:'삼보첨단소재',
+                    product:'TK-164K',
                     count: 3,
-                    unit_price: 20000,
+                    price: 20000,
                     total: 60000
                 }
             ],
         }
+    },
+    methods: {
+      getHistory(){
+          axios.get(ip + "/history").then((res)=>{
+            console.log(res.data)
+            this.history = res.data;
+
+          })
+
+
+      }
+    },
+    
+    mounted(){  //페이지 로드 시 최초 1번 실행
+      this.getHistory()
     }
 }
 </script>
 <style lang="">
     
+  
 </style>
