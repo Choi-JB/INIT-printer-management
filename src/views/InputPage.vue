@@ -1,12 +1,21 @@
 <template lang="">
     <div>
-        <!-- 입력 항목 선택창 -->
-        <v-select
-            v-model="select"
-            clearable
-            label="선택"
-            :items="menu"
-        ></v-select>
+    <!-- 입력 항목 선택창 -->
+    <v-container fluid>
+    <v-radio-group
+      v-model="inline"
+      inline
+    >
+      <v-radio
+        label="Option 1"
+        value="radio-1"
+      ></v-radio>
+      <v-radio
+        label="Option 2"
+        value="radio-2"
+      ></v-radio>
+    </v-radio-group>
+  </v-container>
 
         <v-card
             :loading="isUpdating"
@@ -96,7 +105,7 @@
               label="개수"
               
             ></v-text-field>
-
+            <!-- 단가 입력 -->
             <v-text-field
               v-model="price"
               type="number"
@@ -113,7 +122,7 @@
       </v-container>
     
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <!-- 버튼 -->
     <v-card-actions>
@@ -143,7 +152,8 @@
 
     </v-form>
     </v-card>
-
+    
+    <!-- 전송 전 확인창 -->
     <v-dialog 
       v-model="dialog"
       persistent
@@ -153,11 +163,13 @@
         <v-row justify="center">
           
         <v-card-text class="text-h6" >
-          입력한 값이 맞습니까? 
+          입력한 값을 확인해주세요 
           <br>
           <p class="text-xs-center">
           {{selectDate}} | {{select}} | {{client}} | {{product}} | {{count}} | {{price}}
         </p>
+
+
         </v-card-text>
         </v-row>
         <v-row justify="center">
@@ -184,158 +196,162 @@ import { DatePicker } from 'v-calendar';
 
 import 'v-calendar/dist/style.css';
 import axios from "axios";
-import {ip} from '../router/ip';
+import { ip } from '../router/ip';
 
 
 export default {
-    components:{
-      DatePicker
+  components: {
+    DatePicker
+  },
+  data() {
+    return {
+      inline: null,
+
+      //선택한 날짜 데이터 포맷
+      date: new Date(),
+      selectDate: new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()),
+      masks: {
+        input: 'YYYY-MM-DD'
+      },
+
+      //입력 후 마지막 확인창 on/off
+      dialog: false,
+
+      //현재 선택한 메뉴
+      select: '출고',
+      menu: [
+        '출고',
+        '매입',
+        '판매',
+        '입고',
+        '사무실사용'
+      ],
+
+      //상품명
+      product: '',
+      productList: [
+
+      ],
+
+      //거래처
+      client: null,
+      client_rule: [
+        v => !!v || '거래처는 필수 입력사항입니다.',
+
+      ],
+      clientList: [],
+
+      //개수, 단가
+      count: 1,
+      price: null,
+      price_rule: [
+        v => !(v == 0) || '단가를 확인해 주세요.'
+
+      ],
+
+
+    }
+  },
+
+  watch: {
+    isUpdating(val) {
+      if (val) {
+        setTimeout(() => (this.isUpdating = false), 3000)
+      }
     },
-    data(){
-        return{
-          //선택한 날짜 데이터 포맷
-            date : new Date(),
-            selectDate: new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date()),
-            masks:{
-              input: 'YYYY-MM-DD'
-            },
 
-            //입력 후 마지막 확인창 on/off
-            dialog:false,
-
-            //현재 선택한 메뉴
-            select: '출고',
-            menu:[
-                '출고',
-                '매입',
-                '판매',
-                '입고',
-                '사무실사용'
-            ],
-
-            //상품명
-            product:'',
-            productList:[
-
-            ],
-              
-            //거래처
-            client:null,
-            client_rule:[
-              v => !!v || '거래처는 필수 입력사항입니다.',
-              
-            ] ,
-            clientList:[],
-
-            //개수, 단가
-            count:1,
-            price:null,
-            price_rule:[
-              v => !(v==0)||'단가를 확인해 주세요.'
-              
-            ] ,
+  },
 
 
-        }
+  methods: {
+
+    remove(item) {
+      const index = this.friends.indexOf(item.name)
+      if (index >= 0) this.friends.splice(index, 1)
+    },
+    async validate() {
+      const { valid } = await this.$refs.form.validate()
+
+      if (valid) alert('Form is valid')
+    },
+    //입력폼 모두 초기화
+    reset() {
+      this.$refs.form.reset()
+      this.selectDate = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    },
+    //달력 선택한 날짜 표기
+    showDate() {
+      var new_date = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(this.date);
+      this.selectDate = new_date;
+      console.log(new_date)
+    },
+    //productList 필터
+    productFilter(item, queryText) {
+      const textOne = item.name.toLowerCase()
+      const searchText = queryText.toLowerCase()
+
+      return textOne.indexOf(searchText) > -1
     },
 
-    watch: {
-            isUpdating (val) {
-                if (val) {
-                setTimeout(() => (this.isUpdating = false), 3000)
-                }
-            },
-           
-       },
+    //제품 선택 시 단가 자동입력
+    setPrice() {
 
-    methods: {
-      
-      remove (item) {
-        const index = this.friends.indexOf(item.name)
-        if (index >= 0) this.friends.splice(index, 1)
-      },
-      async validate () {
-        const { valid } = await this.$refs.form.validate()
+    },
 
-        if (valid) alert('Form is valid')
-      },
-      //입력폼 모두 초기화
-      reset () {
-        this.$refs.form.reset()
-        this.selectDate = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date());
-      },
-      //달력 선택한 날짜 표기
-      showDate(){
-        var new_date = new Intl.DateTimeFormat('fr-ca',{year:"numeric", month:"2-digit", day:"2-digit"}).format(this.date);
-        this.selectDate = new_date;
-        console.log(new_date)
-      },
-      //productList 필터
-      productFilter(item, queryText){
-        const textOne = item.name.toLowerCase()
-        const searchText = queryText.toLowerCase()
-
-        return textOne.indexOf(searchText) > -1 
-      },
-      
-      //제품 선택 시 단가 자동입력
-      setPrice(){
-
-      },
-
-      //입력한 내용 제출
-      sendData(){
-          axios.post(ip + "/input", 
-            { params:{
-                date: this.selectDate,
-                type: this.select,
-                product: this.product,
-                client: this.client,
-                count: this.count,
-                price: this.price,
-            }
-          }).then((res)=>{
-            console.log(res);
-            alert("success!")
-          }).catch((err)=>{
-            console.log(err);
-            alert(err);
-          }).finally(()=>{
-            //console.log("항상 마지막에 실행");
-          })
-      },
-      
-      //상품리스트, 거래처 리스트 가져오기
-      getList(type){
-        axios.get(ip + "/list", {params:{type}}).then((res)=>{
-
-          //  //DB에서 가져온 행들에서 이름만 분리
-          // let list = [];
-          // for(var idx in res.data){
-          //   console.log(res.data[idx]);
-
-          //   //예외처리 
-          //   if(res.data[idx].type=="급지롤러"){
-          //     console.log(res.data[idx].type);
-          //     list.push(res.data[idx].name + '(' + res.data[idx].note + ')');
-          //   } else{
-          //     list.push(res.data[idx].name);
-          //   }
-          // }
-          // this.productList = list;
-        
-          
-          if(type=="Product"){
-            this.productList = [...res.data];
-          } else if(type=="Client"){
-            this.clientList = [...res.data];
+    //입력한 내용 제출
+    sendData() {
+      axios.post(ip + "/input",
+        {
+          params: {
+            date: this.selectDate,
+            type: this.select,
+            product: this.product,
+            client: this.client,
+            count: this.count,
+            price: this.price,
           }
-
+        }).then((res) => {
+          console.log(res);
+          alert("success!")
+        }).catch((err) => {
+          console.log(err);
+          alert(err);
+        }).finally(() => {
+          //console.log("항상 마지막에 실행");
         })
-      },
-
     },
-        
+
+    //상품리스트, 거래처 리스트 가져오기
+    getList(type) {
+      axios.get(ip + "/list", { params: { type } }).then((res) => {
+
+        //  //DB에서 가져온 행들에서 이름만 분리
+        // let list = [];
+        // for(var idx in res.data){
+        //   console.log(res.data[idx]);
+
+        //   //예외처리 
+        //   if(res.data[idx].type=="급지롤러"){
+        //     console.log(res.data[idx].type);
+        //     list.push(res.data[idx].name + '(' + res.data[idx].note + ')');
+        //   } else{
+        //     list.push(res.data[idx].name);
+        //   }
+        // }
+        // this.productList = list;
+
+
+        if (type == "Product") {
+          this.productList = [...res.data];
+        } else if (type == "Client") {
+          this.clientList = [...res.data];
+        }
+
+      })
+    },
+
+  },
+
 }
 </script>
 <style lang="">

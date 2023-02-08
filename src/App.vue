@@ -52,22 +52,22 @@ export default {
     menu: [
       {
         //좌측 메뉴 목록
-        name: "통계 / 현황",
+        name: "통계",
         link: "./dashboard",
         title: "dashboard",
         icon: "mdi-view-dashboard",
       },
       {
-        name: "출고 / 임대",
-        link: "./release",
-        title: "release",
-        icon: "mdi-printer",
-      },
-      {
-        name: "매입 / 입고",
+        name: "매입 - 입고",
         link: "./purchase",
         title: "purchase",
         icon: "mdi-cart",
+      },
+      {
+        name: "출고 - 부품 교체",
+        link: "./release",
+        title: "release",
+        icon: "mdi-printer",
       },
       {
         name: "판매",
@@ -76,16 +76,22 @@ export default {
         icon: "mdi-cash",
       },
       {
-        name: "관리 설정",
-        link: "./settings",
-        title: "settings",
-        icon: "mdi-cog",
+        name: "사무실 재고",
+        link: "./stock",
+        title: "stock",
+        icon: "mdi-warehouse",
       },
       {
         name: "기록",
         link: "./history",
         title: "history",
         icon: "mdi-history",
+      },
+      {
+        name: "관리 설정",
+        link: "./settings",
+        title: "settings",
+        icon: "mdi-cog",
       },
       {
         name: "입력test",
