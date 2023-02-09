@@ -1,12 +1,7 @@
 <template>
   <v-app>
     <!-- header 부분 -->
-    <v-app-bar
-      :elevation="5"
-      name="app-bar"
-      class="justify-center"
-      color="grey-lighten-4"
-    >
+    <v-app-bar :elevation="5" name="app-bar" class="justify-center" color="grey-lighten-4">
       <template v-slot:prepend>
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
@@ -23,11 +18,7 @@
       <v-list density="compact" nav>
         <div v-for="(a, i) in menu" :key="i">
           <router-link :to="menu[i].link">
-            <v-list-item
-              :prepend-icon="menu[i].icon"
-              :title="menu[i].name"
-              :value="menu[i].title"
-            />
+            <v-list-item :prepend-icon="menu[i].icon" :title="menu[i].name" :value="menu[i].title" />
           </router-link>
           <v-divider></v-divider>
         </div>
@@ -77,8 +68,8 @@ export default {
       },
       {
         name: "사무실 재고",
-        link: "./stock",
-        title: "stock",
+        link: "./inventory",
+        title: "inventory",
         icon: "mdi-warehouse",
       },
       {

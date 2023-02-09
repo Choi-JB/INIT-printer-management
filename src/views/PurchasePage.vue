@@ -2,29 +2,6 @@
   <v-container>
     <v-card>
 
-    <!-- 카테고리 선택창 -->
-    <v-radio-group
-      v-model="category"
-      inline
-    >
-      <v-radio
-        label="토너"
-        value="토너"
-      ></v-radio>
-      <v-radio
-        label="부품"
-        value="부품"
-      ></v-radio>
-      <v-radio
-        label="프린터"
-        value="프린터"
-      ></v-radio>
-      <v-radio
-        label="복합기"
-        value="복합기"
-      ></v-radio>
-    </v-radio-group>
-
     <!-- 유저 입력 영역 -->
     <v-form
       ref="form"
@@ -37,17 +14,66 @@
         <!-- 날짜선택 -->
         <v-col cols="12" md="4">
           <DatePicker v-model="date" @click="showDate()"  :max-date="new Date()" :data="masks"/>
-          <!--@click="showDate()"  -->
           <p v-if="selectDate!='1970-01-01'">{{selectDate}}</p>
           <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
         </v-col>
 
         
         <v-col cols="12" md="6">
-            <!-- 제품 선택 -->
+
+           <!-- 매입처 입력 -->
+          <v-autocomplete
+            v-model="client"
+            :loading="loading"
+            :disabled="isUpdating"
+            :items="clientList"
+            
+            variant="filled"
+            color="blue-grey-lighten-2"
+            label="*매입처"
+            item-title="name"
+            item-value="name"
+            
+          >
+          <template v-slot:item="{ props, item }">
+              <v-list-item
+                v-bind="props"
+                :title="item?.raw?.name"
+              ></v-list-item>
+            </template>
+          </v-autocomplete>
+
+     <!-- 카테고리 선택창 -->
+    <v-radio-group
+      v-model="category"
+      inline
+    >
+      <v-radio
+        label="토너"
+        value="토너"
+        color="primary"
+      ></v-radio>
+      <v-radio
+        label="부품"
+        value="부품"
+        color="primary"
+      ></v-radio>
+      <v-radio
+        label="프린터"
+        value="프린터"
+        color="primary"
+      ></v-radio>
+      <v-radio
+        label="복합기"
+        value="복합기"
+        color="primary"
+      ></v-radio>
+    </v-radio-group>
+
+            <!-- 제품 선택 -->         <!-- 리스트에 스크롤 추가 필요 -->
             <v-autocomplete
             v-model="product"
-            :items="productList"
+            :items="filterList"
             
             variant="filled"
             color="blue-grey-lighten-2"
@@ -55,7 +81,7 @@
             
             item-title="name"
             item-value="item"
-            @change="updateProduct()"
+
             return-object
           >
           
@@ -69,30 +95,6 @@
             </v-slide-x-reverse-transition>
           </template>
         </v-autocomplete>
-
-          <!-- 거래처 입력 -->
-          <v-autocomplete
-            v-model="client"
-            :loading="loading"
-            :disabled="isUpdating"
-            :items="clientList"
-            
-            variant="filled"
-            color="blue-grey-lighten-2"
-            label="*거래처"
-            item-title="name"
-            item-value="name"
-            
-          >
-          <!-- @click="getList('Client')" -->
-          <template v-slot:item="{ props, item }">
-              <v-list-item
-                v-bind="props"
-                :title="item?.raw?.name"
-                :subtitle="item?.raw?.type"
-              ></v-list-item>
-            </template>
-          </v-autocomplete>
 
            <!-- 개수 입력 -->
           <v-text-field
@@ -112,13 +114,9 @@
             label="단가"
             :rules="price_rule"
           ></v-text-field>
-
         </v-col>
         
-        
       </v-row>
-
-  
 
   <v-divider />
 
@@ -179,7 +177,7 @@
   </v-dialog>
 
 
-  <!-- 매입 리스트 목록 -->
+  <!-- 매입 목록 -->
   <v-card
     v-if="purchaseList.length != 0"
   >
@@ -264,7 +262,7 @@ export default {
   },
   data() {
     return {
-      category: '토너',
+      category: '복합기',
 
       //선택한 날짜 데이터 포맷
       date: new Date(),
@@ -281,9 +279,8 @@ export default {
 
       //상품명
       product: '',
-      productList: [
-
-      ],
+      productList: [],
+      filterList: [],
 
       //거래처
       client: null,
@@ -308,6 +305,7 @@ export default {
     }
   },
 
+  //특정 요소가 변경될때
   watch: {
     isUpdating(val) {
       if (val) {
@@ -315,11 +313,15 @@ export default {
       }
     },
 
+    category() {
+      // console.log("현재 카테고리 : " + this.category)
+      this.changeProductList()
+    },
+
     //product값 변경 시 제품 정보 세팅
     product: {
       handler() {
         this.price = this.product.price
-        this.category = this.product.category
       }
     }
   },
@@ -347,6 +349,8 @@ export default {
       this.selectDate = new_date;
       // console.log(new_date)
     },
+
+
     //productList 필터
     productFilter(item, queryText) {
       const textOne = item.name.toLowerCase()
@@ -355,12 +359,6 @@ export default {
       return textOne.indexOf(searchText) > -1
     },
 
-    //제품 선택 시 제품정보 자동입력
-    updateProduct() {
-      // this.price = this.product.price
-      // this.category = this.product.category
-      console.log('change')
-    },
 
     //입력한 내용 제출
     sendData() {
@@ -379,22 +377,42 @@ export default {
     },
 
     //상품리스트, 거래처 리스트 가져오기
-    getList(type) {
-      axios.get(ip + "/list", { params: { type } }).then((res) => {
+    getList() {
+      axios.get(ip + `/list?data=${encodeURIComponent('매입')}`).then((res) => {
 
-        if (type == "Product") {
-          this.productList = [...res.data];
-        } else if (type == "Client") {
-          this.clientList = [...res.data];
-        }
+        this.productList = [...res.data.productList];
+        this.clientList = [...res.data.clientList];
 
+        //목록 가져 온 후 카테고리별로 목록 수정하게
+        this.category = '토너';
       })
     },
+
+    //카테고리별로 제품 목록 분류
+    changeProductList() {
+      var list = [];
+
+      //현재 선택 중인 카테고리 목록만 분류
+      for (var index in this.productList) {
+        //console.log(this.category + ' / ' + this.productList[index].category)
+
+        if (this.category == this.productList[index].category) {
+          //console.log('match!')
+          list.push(this.productList[index])
+        }
+      }
+      console.log(list)
+
+      this.filterList = [...list]
+    },
+
 
     //매입목록에 추가
     addList() {
       if (this.product == null || this.client == null || this.count == null || this.price == null) {
         alert('입력값을 채워주세요!')
+      } else if (this.purchaseList.length >= 5) {
+        alert('한번에 5개까지만 입력가능합니다!')
       }
       else {
         this.purchaseList.push({
@@ -405,6 +423,7 @@ export default {
           product: this.product.name,
           count: this.count,
           price: this.price,
+          total: this.count * this.price
         })
 
         this.purchasePrice += this.count * this.price
@@ -415,7 +434,7 @@ export default {
     resetList() {
       this.purchaseList = [];
     },
-    //매입목록 선택한 리스트 제거
+    //매입목록 중 선택한 리스트 제거
     deleteList(list) {
       this.purchaseList.splice(this.purchaseList.indexOf(list), 1)
       this.purchasePrice -= (list.price * list.count)
@@ -425,8 +444,8 @@ export default {
 
   //최초 한번 실행
   mounted() {
-    this.getList("Product");
-    this.getList("Client");
+    this.getList();
+
   }
 
 }

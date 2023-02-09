@@ -14,6 +14,9 @@
         <th class="text-left">
           거래처
         </th>
+        <!-- <th class="text-left">
+          품목
+        </th> -->
         <th class="text-left">
           품명
         </th>
@@ -36,6 +39,7 @@
         <td>{{ item.type }}</td>
         <td>{{ item.date }}</td>
         <td>{{ item.client }}</td>
+        <!-- <td>{{ item.category }}</td> -->
         <td>{{ item.product }}</td>
         <td>{{ item.price.toLocaleString('ko-KR') }}</td>
         <td>{{ item.count }}</td>
@@ -46,50 +50,29 @@
 </template>
 <script>
 import axios from "axios";
-import {ip} from '../router/ip';
+import { ip } from '../router/ip';
 
 export default {
-    data () {
-        return {
-            history:[
-                {
-                    id:'1',
-                    type:'매입',
-                    date:'2022-08-23',
-                    client:'한별시스템',
-                    product:'TK-5244Y',
-                    price: 18000,
-                    count: 5,
-                    total: 90000
-                },
-                {
-                    id:'2',
-                    type:'출고',
-                    date:'2022-08-23',
-                    client:'삼보첨단소재',
-                    product:'TK-164K',
-                    count: 3,
-                    price: 20000,
-                    total: 60000
-                }
-            ],
-        }
-    },
-    methods: {
-      getHistory(){
-          axios.get(ip + "/history").then((res)=>{
-            console.log(res.data)
-            this.history = res.data;
-
-          })
-
-
-      }
-    },
-    
-    mounted(){  //페이지 로드 시 최초 1번 실행
-      this.getHistory()
+  data() {
+    return {
+      history: [],
     }
+  },
+  methods: {
+    getHistory() {
+      axios.get(ip + "/history").then((res) => {
+        console.log(res.data)
+        this.history = res.data;
+
+      })
+
+
+    }
+  },
+
+  mounted() {  //페이지 로드 시 최초 1번 실행
+    this.getHistory()
+  }
 }
 </script>
 <style lang="">

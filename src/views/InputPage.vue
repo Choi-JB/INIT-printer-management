@@ -51,7 +51,7 @@
               label="제품"
               item-title="name"
               item-value="name"
-              @click="getList('Product')"
+              
               
             >
             <template v-slot:item="{ props, item }">
@@ -85,7 +85,7 @@
               label="거래처"
               item-title="name"
               item-value="name"
-              @click="getList('Client')"
+              
             >
             <template v-slot:item="{ props, item }">
                 <v-list-item
@@ -322,8 +322,13 @@ export default {
     },
 
     //상품리스트, 거래처 리스트 가져오기
-    getList(type) {
-      axios.get(ip + "/list", { params: { type } }).then((res) => {
+    getList() {
+      axios.get(ip + "/list", {
+        params: {
+          type: this.type,
+
+        }
+      }).then((res) => {
 
         //  //DB에서 가져온 행들에서 이름만 분리
         // let list = [];
@@ -339,19 +344,21 @@ export default {
         //   }
         // }
         // this.productList = list;
+        console.log(res.data)
 
+        this.productList = [...res.data.productList];
 
-        if (type == "Product") {
-          this.productList = [...res.data];
-        } else if (type == "Client") {
-          this.clientList = [...res.data];
-        }
+        this.clientList = [...res.data.clientList];
+
 
       })
     },
 
-  },
 
+  },
+  mounted() {
+    this.getList()
+  }
 }
 </script>
 <style lang="">
