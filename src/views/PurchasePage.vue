@@ -83,6 +83,8 @@
             item-value="item"
 
             return-object
+            density="comfortable"
+            
           >
           
           <template v-slot:item="{ props, item }">
@@ -209,6 +211,7 @@
         </th>
       </tr>
     </thead>
+    
     <tbody>
       <tr
         v-for="list in purchaseList"
@@ -227,7 +230,9 @@
               @click="deleteList(list)"
           ></v-icon></td>
       </tr>
+
       <v-devider></v-devider>
+
       <tr class="text-xs-center">
         <td></td>
         <td></td>
@@ -237,6 +242,7 @@
         <td>{{purchasePrice.toLocaleString('ko-KR')}} 원</td>
       </tr>
     </tbody>
+
   </v-table>
   <v-card-actions>
         <v-btn block size="large"
