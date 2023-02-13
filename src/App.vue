@@ -27,7 +27,9 @@
 
     <!-- 메인 화면 -->
     <v-main>
-      <router-view />
+      <v-fade-transition>
+        <router-view />
+      </v-fade-transition>
     </v-main>
   </v-app>
 </template>
@@ -101,5 +103,12 @@ export default {
 a {
   text-decoration: none;
   color: black;
+}
+
+.fade-enter-active, .fade-leave-active{
+  transition:opacity .5s;
+}
+.fade-enter, .fade-leave-to{
+  opacity: 0;
 }
 </style>

@@ -1,5 +1,22 @@
 <template lang="">
   <v-container>
+    <!-- 매입/입고 선택 -->
+    <v-radio-group
+      v-model="select"
+      inline
+    >
+      <v-radio
+        label="매입"
+        value="매입"
+        color="primary"
+      ></v-radio>
+      <v-radio
+        label="입고"
+        value="입고"
+        color="primary"
+      ></v-radio>
+    </v-radio-group>
+
     <v-card>
 
     <!-- 유저 입력 영역 -->
@@ -21,7 +38,7 @@
         
         <v-col cols="12" md="6">
 
-           <!-- 매입처 입력 -->
+           <!-- 거래처 입력 -->
           <v-autocomplete
             v-model="client"
             :loading="loading"
@@ -30,7 +47,7 @@
             
             variant="filled"
             color="blue-grey-lighten-2"
-            label="*매입처"
+            label="*거래처"
             item-title="name"
             item-value="name"
             
@@ -151,7 +168,7 @@
   </v-form>
   </v-card>
 
- <!-- 매입 완료 재확인 창 -->
+ <!-- 입력 완료 재확인 창 -->
 <v-dialog 
     v-model="dialog"
     persistent
@@ -179,74 +196,78 @@
   </v-dialog>
 
 
-  <!-- 매입 목록 -->
+  <!-- 매입/입고 목록 -->
   <v-card
-    v-if="purchaseList.length != 0"
-  >
+    
+  ><!-- v-if="purchaseList.length != 0" -->
+
    <v-table
-    fixed-header
+
   >
-    <thead>
-      <tr>
-        <th>
+    <thead >
+      
+      <tr class="table-head">
+        <th  class="text-center">
           번호
         </th>
-        <th>
+        <th class="text-center">
           매입처
         </th>
-        <th>
+        <th class="text-center">
           품명
         </th>
-        <th>
+        <th class="text-center">
           단가
         </th>
-        <th>
+        <th class="text-center">
           개수
         </th>
-        <th>
+        <th class="text-center">
           금액
         </th>
         <th>
            
         </th>
       </tr>
-    </thead>
     
+    </thead>
+
     <tbody>
+      <v-slide-x-transition group="true">
       <tr
         v-for="list in purchaseList"
-        :key="list"
+        :key="list" 
       >
-        <td>{{purchaseList.indexOf(list)+1}}</td>
-        <td>{{list.client}}</td>
-        <td>{{list.product}}</td>
+        <td class="text-center">{{purchaseList.indexOf(list)+1}}</td>
+        <td class="text-center">{{list.client}}</td>
+        <td class="text-center">{{list.product}}</td>
         
         <!-- 문자로 인식해서 x1 해서 숫자처리 -->
-        <td>{{(list.price * 1).toLocaleString('ko-KR')}} 원</td>  
-        <td>{{list.count}}</td>
-        <td>{{(list.price * list.count).toLocaleString('ko-KR')}} 원</td>
-        <td><v-icon icon="mdi-delete"
+        <td class="text-right">{{(list.price * 1).toLocaleString('ko-KR')}} 원</td>
+        <transition name="scroll">
+          <td class="text-center">{{list.count}}</td>
+        </transition>  
+        <td lass="text-right">{{(list.price * list.count).toLocaleString('ko-KR')}} 원</td>
+        <td lass="text-right"><v-icon icon="mdi-delete"
               
               @click="deleteList(list)"
           ></v-icon></td>
       </tr>
-
+   
       <v-devider></v-devider>
 
       <tr class="text-xs-center">
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td class="text-xs-right">합계 금액</td>
-        <td>{{purchasePrice.toLocaleString('ko-KR')}} 원</td>
+        <td class="text-center" colspan="4">합계 금액</td>
+        <td colspan="3">{{purchasePrice.toLocaleString('ko-KR')}} 원</td>
       </tr>
+    </v-slide-x-transition>
     </tbody>
 
   </v-table>
+
   <v-card-actions>
-        <v-btn block size="large"
-          color="secondary" @click="dialog = true">매입 완료</v-btn>
+        <v-btn block size="large" v-if="purchaseList.length != 0"
+          color="secondary" @click="dialog = true">{{this.select}} 완료</v-btn>
   </v-card-actions>
 
   </v-card>
@@ -268,7 +289,7 @@ export default {
   },
   data() {
     return {
-      category: '복합기',
+      category: '',
 
       //선택한 날짜 데이터 포맷
       date: new Date(),
@@ -327,8 +348,17 @@ export default {
     //product값 변경 시 제품 정보 세팅
     product: {
       handler() {
-        this.price = this.product.price
+        if(this.product){
+          this.price = this.product.price
+        }
       }
+    },
+
+    select(){
+      console.log(this.select)
+      this.resetList();
+      this.reset();
+      this.count = 1;
     }
   },
 
@@ -421,24 +451,40 @@ export default {
         alert('한번에 5개까지만 입력가능합니다!')
       }
       else {
-        this.purchaseList.push({
-          type: this.select,
-          category: this.category,
-          date: this.selectDate,
-          client: this.client,
-          product: this.product.name,
-          count: this.count,
-          price: this.price,
-          total: this.count * this.price
+        let exist = -1;
+
+        //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
+        this.purchaseList.forEach(object => {
+          
+          if(object.product===this.product.name && object.price===this.price){
+            console.log(object.count)
+            console.log(this.count)
+            object.count = this.count*1 + object.count;
+            exist = 1;
+            
+          }
         })
 
+        if(exist!=1){
+          this.purchaseList.push({
+              type: this.select,
+              category: this.category,
+              date: this.selectDate,
+              client: this.client,
+              product: this.product.name,
+              count: this.count,
+              price: this.price,
+              total: this.count * this.price
+             })
+        } 
         this.purchasePrice += this.count * this.price
+        console.log(this.purchasePrice)
       }
-
     },
     //매입목록 초기화
     resetList() {
       this.purchaseList = [];
+      this.purchasePrice = 0;
     },
     //매입목록 중 선택한 리스트 제거
     deleteList(list) {
@@ -456,6 +502,8 @@ export default {
 
 }
 </script>
-<style lang="">
-
+<style>
+.scroll{
+  transition: 0.1s;
+}
 </style>
