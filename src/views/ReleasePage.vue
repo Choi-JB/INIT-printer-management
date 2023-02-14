@@ -11,14 +11,15 @@
         color="primary"
       ></v-radio>
       <v-radio
-        label="부품교체"
-        value="부품교체"
-        color="primary"
-      ></v-radio>
-      <v-radio
         label="판매"
         value="판매"
         color="primary"
+      ></v-radio>
+      <v-radio
+        label="직접사용"
+        value="직접사용"
+        color="primary"
+        unabled
       ></v-radio>
     </v-radio-group>
 
@@ -47,7 +48,7 @@
           <v-autocomplete
             v-model="client"
             :loading="loading"
-            :disabled="isUpdating"
+            :disabled="isEditing"
             :items="clientList"
             
             variant="filled"
@@ -69,7 +70,6 @@
     <v-radio-group
       v-model="category"
       inline
-      :disabled="isEditing"
     >
       <v-radio
         label="토너"
@@ -93,12 +93,11 @@
       ></v-radio>
     </v-radio-group>
 
-            <!-- 제품 선택 -->         <!-- 리스트에 스크롤 추가 필요 -->
+            <!-- 제품 선택 -->         <!-- :menu-props="{maxHeight:300} 메뉴리스트 길이조절" -->
             <v-autocomplete
             v-model="product"
             :items="filterList"
             
-            variant="filled"
             color="blue-grey-lighten-2"
             label="*제품"
             
@@ -106,20 +105,19 @@
             item-value="item"
 
             return-object
-            density="comfortable"
-            
+
+            :menu-props="{ maxHeight: 300 }"
           >
           
           <template v-slot:item="{ props, item }">
-            <v-slide-x-reverse-transition mode="out-in">
               <v-list-item
                 v-bind="props"
                 :title="item?.raw?.product"
                 :subtitle="item?.raw?.price+'원 / 남은 재고 : '+item?.raw?.count"
               ></v-list-item>
-            </v-slide-x-reverse-transition>
           </template>
         </v-autocomplete>
+
 
            <!-- 개수 입력 -->
           <v-text-field
@@ -127,17 +125,21 @@
             type="number"
             :disabled="!countValid"
             color="blue-grey-lighten-2"
-            label="*개수"
+            :label="product ? ('사무실 남은 재고 : ' + product.count) : '*개수'"
             :rules="count_rule"
+
           ></v-text-field>
+
+
           <!-- 단가 입력 -->
           <v-text-field
             v-model="price"
             type="number"
             :disabled="isUpdating"
             color="blue-grey-lighten-2"
-            label="단가"
+            label="단가 (단위 : 원￦)"
             :rules="price_rule"
+  
           ></v-text-field>
         </v-col>
         
@@ -179,6 +181,7 @@
     v-model="dialog"
     persistent
     absolute
+    transition="dialog-bottom-transition"
   >
     <v-card>
       <v-row justify="center">
@@ -201,7 +204,6 @@
     </v-card>
   </v-dialog>
 
-
   <!-- 출고/수리/판매 목록 -->
   <v-card>
    <v-table
@@ -214,7 +216,7 @@
           번호
         </th>
         <th class="text-center">
-          매입처
+          거래처
         </th>
         <th class="text-center">
           품명
@@ -235,7 +237,7 @@
     
     </thead>
     <tbody>
-      <v-slide-x-transition group="true">
+      <v-slide-x-transition group="true"> <!-- 애니메이션 효과 -->
       <tr
         v-for="list in releaseList"
         :key="list" 
@@ -288,7 +290,7 @@ export default {
   },
   data() {
     return {
-      isEditing:null,
+      isEditing: null,
 
       //현재 선택한 메뉴
       select: '출고',
@@ -321,23 +323,25 @@ export default {
 
       //개수, 단가
       count: 1,
-      countValid:null,
-      count_rule:[
+      countValid: null,
+      count_rule: [
         v => {
-          if(v <= this.product.count)
+
+          if (v <= this.product.count)
             return true
 
           return '남은 재고보다 많은 수량입니다!'
         }
+
       ],
 
       price: null,
       price_rule: [
-        v => !(v == 0) || '단가를 확인해 주세요.'
+        v => !(v == '') || '단가를 확인해 주세요.'
 
       ],
 
-      //매입한 물품 리스트
+      // 물품 리스트
       releaseList: [],
       releasePrice: 0,
 
@@ -352,6 +356,7 @@ export default {
       }
     },
 
+    //토너, 부품 등 카테고리 변경시 제품목록 변경
     category() {
       // console.log("현재 카테고리 : " + this.category)
       this.changeProductList()
@@ -360,43 +365,46 @@ export default {
     //product값 변경 시 제품 정보 세팅
     product: {
       handler() {
-        if(this.product){
+        if (this.product) {     //물품 선택 후에 개수 변경 가능하게
           this.price = this.product.price
           this.countValid = true
-        } 
+        }
       }
     },
     //사무실 재고만큼 개수 제한
-    count(){
-      if(this.product){
-        if(this.count > this.product.count){
+    count() {
+      if (this.product) {
+        if (this.count > this.product.count) {
           this.count = this.product.count
           alert('사무실 재고보다 많은 수량을 입력할 수 없습니다!')
         }
       }
     },
 
-    //카테고리 변경 시 제품목록 변경
-    select(){
-      console.log(this.select)
+    //출고, 판매 항목 변경 시 제품목록 변경
+    select() {
+      //순서 중요!
       this.resetList();
       this.reset();
-      if(this.select=='출고'){
-        this.category = '토너'
-        this.isEditing = null;
-      } else if(this.select=='부품교체'){
-        this.category = '부품'
+
+
+      //직접 사용시 거래처 항목 선택 불가능하게
+      if (this.select == '직접사용') {
         this.isEditing = !this.isEditing
-      } else{
+        this.client = '직접사용'
+        console.log(this.client)
+      } else {
         this.isEditing = null;
+        console.log(this.client)
       }
-      this.count = 1;
+
+      // this.count = 1;         //기본값 세팅
     }
   },
 
 
   methods: {
-
+    //밑에 두 함수는 필요한가??
     remove(item) {
       const index = this.friends.indexOf(item.name)
       if (index >= 0) this.friends.splice(index, 1)
@@ -406,10 +414,16 @@ export default {
 
       if (valid) alert('Form is valid')
     },
+
     //입력폼 모두 초기화
     reset() {
-      this.$refs.form.reset()
+      //this.$refs.form.reset()
+      this.client = null
+      this.product = null
+      this.count = 1
+      this.price = null
       this.selectDate = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+
     },
     //달력 선택한 날짜 표기
     showDate() {
@@ -419,7 +433,7 @@ export default {
     },
 
 
-    //productList 필터
+    //productList 필터 (안씀)
     productFilter(item, queryText) {
       const textOne = item.name.toLowerCase()
       const searchText = queryText.toLowerCase()
@@ -439,9 +453,11 @@ export default {
         }).catch((err) => {
           console.log(err);
           alert(err);
-        }).finally(() => {
+        }).finally(() => {    //제출 후 항목들 초기화
           //console.log("항상 마지막에 실행");
           this.getList()
+          this.reset()
+          this.resetList()
         })
     },
 
@@ -453,18 +469,19 @@ export default {
         //this.productList = [...res.data.productList];
         this.clientList = [...res.data.clientList];
 
-        
+
       })
+
       //사무실 재고 불러오기
       axios.get(ip + "/inventory").then((res) => {
-                //console.log(res.data)
-                //this.inventory = res.data;
-                //this.category = '전체'
-                this.productList = [...res.data];
-                console.log(this.productList)
+        //console.log(res.data)
+        //this.inventory = res.data;
+        //this.category = '전체'
+        this.productList = [...res.data];
+        console.log(this.productList)
 
-          //목록 가져 온 후 카테고리별로 목록 수정하게
-          this.category = '토너';
+        //목록 가져 온 후 카테고리별로 목록 수정하게
+        this.category = '토너';
       })
     },
 
@@ -475,8 +492,8 @@ export default {
       //현재 선택 중인 카테고리 목록만 분류
       for (var index in this.productList) {
 
-        //수량이 0이면 표시x
-        if (this.category == this.productList[index].category && this.productList[index].count != 0) {
+        //수량이 0이면 표시x  //&& this.productList[index].count != 0 //DB단계 에서 수량 0이면 가져오지 않게 바꿈
+        if (this.category == this.productList[index].category) {
           //console.log('match!')
           list.push(this.productList[index])
         }
@@ -490,7 +507,7 @@ export default {
     //목록에 추가
     addList() {
       if (this.product == null || this.client == null || this.count == null || this.price == null) {
-          alert('입력값을 맞게 입력했는지 확인해주세요!')
+        alert('입력값을 맞게 입력했는지 확인해주세요!')
       } else if (this.releaseList.length >= 5) {
         alert('한번에 5개까지만 입력가능합니다!')
       }
@@ -499,36 +516,34 @@ export default {
 
         //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
         this.releaseList.forEach(object => {
-          
-          if(object.product===this.product.name && object.price===this.price){
+
+          if (object.product === this.product.product && object.price === this.price) {
             console.log(object.count)
             console.log(this.count)
-            object.count = this.count*1 + object.count;
+            object.count = this.count * 1 + object.count;
             exist = 1;
-            
+
           }
         })
-
         //없는 품목이면 새로 추가
-        if(exist!=1){
+        if (exist != 1) {
           this.releaseList.push({
-              type: this.select,
-              category: this.category,
-              date: this.selectDate,
-              client: this.client,
-              product: this.product.product,
-              count: this.count,
-              price: this.price,
-              total: this.count * this.price
-             })
-        } 
+            type: this.select,
+            category: this.category,
+            date: this.selectDate,
+            client: this.client,
+            product: this.product.product,
+            count: this.count,
+            price: this.price,
+            total: this.count * this.price
+          })
+        }
         this.releasePrice += this.count * this.price
-        console.log(this.releasePrice)
+        console.log(this.client)
 
-        this.reset()
       }
 
-      
+
     },
     //목록 초기화
     resetList() {
@@ -537,9 +552,9 @@ export default {
     },
     //목록 중 선택한 행만 제거
     deleteList(list) {
-        this.releaseList.splice(this.releaseList.indexOf(list), 1)
-        this.releasePrice -= (list.price * list.count)
-      
+      this.releaseList.splice(this.releaseList.indexOf(list), 1)
+      this.releasePrice -= (list.price * list.count)
+
     }
 
   },

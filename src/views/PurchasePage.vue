@@ -92,27 +92,25 @@
             v-model="product"
             :items="filterList"
             
-            variant="filled"
             color="blue-grey-lighten-2"
             label="*제품"
             
             item-title="name"
             item-value="item"
 
-            return-object
-            density="comfortable"
+            return-object  
+            style = "max-width:400px;"
+            :menu-props="{ maxHeight: 300 }"
             
           >
-          
           <template v-slot:item="{ props, item }">
-            <v-slide-x-reverse-transition mode="out-in">
               <v-list-item
                 v-bind="props"
                 :title="item?.raw?.name"
                 :subtitle="item?.raw?.note + ' / '+ item?.raw?.price+'원'"
               ></v-list-item>
-            </v-slide-x-reverse-transition>
           </template>
+
         </v-autocomplete>
 
            <!-- 개수 입력 -->
@@ -130,7 +128,7 @@
             type="number"
             :disabled="isUpdating"
             color="blue-grey-lighten-2"
-            label="단가"
+            label="단가 (단위 : 원￦)"
             :rules="price_rule"
           ></v-text-field>
         </v-col>
@@ -211,7 +209,7 @@
           번호
         </th>
         <th class="text-center">
-          매입처
+          거래처
         </th>
         <th class="text-center">
           품명
@@ -348,13 +346,13 @@ export default {
     //product값 변경 시 제품 정보 세팅
     product: {
       handler() {
-        if(this.product){
+        if (this.product) {
           this.price = this.product.price
         }
       }
     },
 
-    select(){
+    select() {
       console.log(this.select)
       this.resetList();
       this.reset();
@@ -376,7 +374,11 @@ export default {
     },
     //입력폼 모두 초기화
     reset() {
-      this.$refs.form.reset()
+      //this.$refs.form.reset()
+      this.client = null
+      this.product = null
+      this.count = 1
+      this.price = null
       this.selectDate = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     },
     //달력 선택한 날짜 표기
@@ -409,6 +411,9 @@ export default {
           alert(err);
         }).finally(() => {
           //console.log("항상 마지막에 실행");
+          this.getList()
+          this.reset()
+          this.resetList()
         })
     },
 
@@ -455,28 +460,28 @@ export default {
 
         //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
         this.purchaseList.forEach(object => {
-          
-          if(object.product===this.product.name && object.price===this.price){
+
+          if (object.product === this.product.name && object.price === this.price) {
             console.log(object.count)
             console.log(this.count)
-            object.count = this.count*1 + object.count;
+            object.count = this.count * 1 + object.count;
             exist = 1;
-            
+
           }
         })
 
-        if(exist!=1){
+        if (exist != 1) {
           this.purchaseList.push({
-              type: this.select,
-              category: this.category,
-              date: this.selectDate,
-              client: this.client,
-              product: this.product.name,
-              count: this.count,
-              price: this.price,
-              total: this.count * this.price
-             })
-        } 
+            type: this.select,
+            category: this.category,
+            date: this.selectDate,
+            client: this.client,
+            product: this.product.name,
+            count: this.count,
+            price: this.price,
+            total: this.count * this.price
+          })
+        }
         this.purchasePrice += this.count * this.price
         console.log(this.purchasePrice)
       }
@@ -503,7 +508,11 @@ export default {
 }
 </script>
 <style>
-.scroll{
+.scroll {
   transition: 0.1s;
+}
+
+.v-autocomplete__content .v-list__tile {
+  height: auto;
 }
 </style>

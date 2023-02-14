@@ -57,17 +57,17 @@ export default {
         icon: "mdi-cart",
       },
       {
-        name: "출고 - 부품 교체",
+        name: "출고 - 부품 교체 - 판매",
         link: "./release",
         title: "release",
         icon: "mdi-printer",
       },
-      {
-        name: "판매",
-        link: "./sale",
-        title: "sale",
-        icon: "mdi-cash",
-      },
+      // {
+      //   name: "판매",
+      //   link: "./sale",
+      //   title: "sale",
+      //   icon: "mdi-cash",
+      // },
       {
         name: "사무실 재고",
         link: "./inventory",
@@ -87,7 +87,7 @@ export default {
         icon: "mdi-cog",
       },
       {
-        name: "입력test",
+        name: "test page",
         link: "./input",
         title: "input",
         icon: "mdi-cog",
@@ -105,10 +105,13 @@ a {
   color: black;
 }
 
-.fade-enter-active, .fade-leave-active{
-  transition:opacity .5s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .5s;
 }
-.fade-enter, .fade-leave-to{
+
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
