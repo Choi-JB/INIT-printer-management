@@ -30,6 +30,7 @@
       ref="form"
       v-model="valid"
       lazy-validation
+      :disalbed="isUpdating"
     >
 
       <v-row>
@@ -97,7 +98,7 @@
             <v-autocomplete
             v-model="product"
             :items="filterList"
-            
+            :disabled="isUpdating"
             color="blue-grey-lighten-2"
             label="*제품"
             
@@ -154,7 +155,7 @@
       <v-btn
           variant="flat"
           color="error"
-          @click="[reset(), resetList()]"
+          @click="resetButton()"
       >
           초기화
       </v-btn>
@@ -290,6 +291,7 @@ export default {
   },
   data() {
     return {
+      isUpdating: null,
       isEditing: null,
 
       //현재 선택한 메뉴
@@ -352,7 +354,7 @@ export default {
   watch: {
     isUpdating(val) {
       if (val) {
-        setTimeout(() => (this.isUpdating = false), 3000)
+        setTimeout(() => (this.isUpdating = false), 1500)
       }
     },
 
@@ -360,6 +362,7 @@ export default {
     category() {
       // console.log("현재 카테고리 : " + this.category)
       this.changeProductList()
+      this.resetForm()
     },
 
     //product값 변경 시 제품 정보 세팅
@@ -376,7 +379,7 @@ export default {
       if (this.product) {
         if (this.count > this.product.count) {
           this.count = this.product.count
-          alert('사무실 재고보다 많은 수량을 입력할 수 없습니다!')
+          //alert('사무실 재고보다 많은 수량을 입력할 수 없습니다!')
         }
       }
     },
@@ -385,7 +388,7 @@ export default {
     select() {
       //순서 중요!
       this.resetList();
-      this.reset();
+      this.resetForm();
 
 
       //직접 사용시 거래처 항목 선택 불가능하게
@@ -416,15 +419,18 @@ export default {
     },
 
     //입력폼 모두 초기화
-    reset() {
+    resetForm() {
       //this.$refs.form.reset()
-      this.client = null
+      if (this.select != '직접사용') {
+        this.client = null
+      }
       this.product = null
       this.count = 1
       this.price = null
       this.selectDate = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-
     },
+
+
     //달력 선택한 날짜 표기
     showDate() {
       var new_date = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(this.date);
@@ -455,14 +461,15 @@ export default {
           alert(err);
         }).finally(() => {    //제출 후 항목들 초기화
           //console.log("항상 마지막에 실행");
-          this.getList()
-          this.reset()
+          //this.getList()
+          this.resetForm()
           this.resetList()
         })
     },
 
     //상품리스트, 거래처 리스트 가져오기
     getList() {
+      this.filterList = []
       //고객 거래처만 불러오기
       axios.get(ip + `/list?data=${encodeURIComponent('고객')}`).then((res) => {
 
@@ -510,6 +517,8 @@ export default {
         alert('입력값을 맞게 입력했는지 확인해주세요!')
       } else if (this.releaseList.length >= 5) {
         alert('한번에 5개까지만 입력가능합니다!')
+      } else if (this.count > this.product.count) {
+        alert('재고가 부족합니다!')
       }
       else {
         let exist = -1;
@@ -517,14 +526,15 @@ export default {
         //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
         this.releaseList.forEach(object => {
 
-          if (object.product === this.product.product && object.price === this.price) {
+          if (object.product == this.product.product && object.price == this.price) {
             console.log(object.count)
             console.log(this.count)
-            object.count = this.count * 1 + object.count;
+            object.count = this.count * 1 + object.count * 1;
             exist = 1;
 
           }
         })
+
         //없는 품목이면 새로 추가
         if (exist != 1) {
           this.releaseList.push({
@@ -539,8 +549,15 @@ export default {
           })
         }
         this.releasePrice += this.count * this.price
-        console.log(this.client)
+        //console.log(this.client)
 
+        //사무실재고 보다 더 많이 나갈 수 없게 하기?
+        this.product.count = this.product.count - this.count
+        this.filterList.forEach(object => {
+          if (object.product == this.product && object.price == this.price) {
+            object.count = object.count * 1 - this.count * 1
+          }
+        })
       }
 
 
@@ -550,6 +567,18 @@ export default {
       this.releaseList = [];
       this.releasePrice = 0;
     },
+
+    //초기화 버튼
+    resetButton() {
+      this.getList()
+
+      this.resetForm()
+      this.resetList()
+
+      this.changeProductList()
+      this.isUpdating = true;
+    },
+
     //목록 중 선택한 행만 제거
     deleteList(list) {
       this.releaseList.splice(this.releaseList.indexOf(list), 1)

@@ -464,7 +464,7 @@ export default {
           if (object.product === this.product.name && object.price === this.price) {
             console.log(object.count)
             console.log(this.count)
-            object.count = this.count * 1 + object.count;
+            object.count = this.count * 1 + object.count * 1;
             exist = 1;
 
           }
