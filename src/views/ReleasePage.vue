@@ -291,14 +291,14 @@ export default {
   },
   data() {
     return {
-      isUpdating: null,
+      isUpdating: null,   //update 중에 사용 못하게
       isEditing: null,
 
       //현재 선택한 메뉴
       select: '출고',
 
       //토너/부품/프린터/복합기
-      category: '',
+      category: '토너',
 
       //선택한 날짜 데이터 포맷
       date: new Date(),
@@ -313,6 +313,7 @@ export default {
       //상품명
       product: '',
       productList: [],
+      //카테고리별 상품 리스트 분류
       filterList: [],
 
       //거래처
@@ -343,7 +344,7 @@ export default {
 
       ],
 
-      // 물품 리스트
+      // 출고/판매 예정 물품 리스트
       releaseList: [],
       releasePrice: 0,
 
@@ -362,7 +363,8 @@ export default {
     category() {
       // console.log("현재 카테고리 : " + this.category)
       this.changeProductList()
-      this.resetForm()
+      //this.resetForm()    제품쪽만 초기화
+      this.product = null;
     },
 
     //product값 변경 시 제품 정보 세팅
@@ -387,21 +389,17 @@ export default {
     //출고, 판매 항목 변경 시 제품목록 변경
     select() {
       //순서 중요!
-      this.resetList();
-      this.resetForm();
-
+      this.resetButton()
 
       //직접 사용시 거래처 항목 선택 불가능하게
       if (this.select == '직접사용') {
         this.isEditing = !this.isEditing
         this.client = '직접사용'
-        console.log(this.client)
+        //console.log(this.client)
       } else {
         this.isEditing = null;
-        console.log(this.client)
+        //console.log(this.client)
       }
-
-      // this.count = 1;         //기본값 세팅
     }
   },
 
@@ -461,22 +459,18 @@ export default {
           alert(err);
         }).finally(() => {    //제출 후 항목들 초기화
           //console.log("항상 마지막에 실행");
-          //this.getList()
-          this.resetForm()
-          this.resetList()
+          this.resetButton()
         })
     },
 
     //상품리스트, 거래처 리스트 가져오기
     getList() {
-      this.filterList = []
+      //this.filterList = []
+
       //고객 거래처만 불러오기
       axios.get(ip + `/list?data=${encodeURIComponent('고객')}`).then((res) => {
 
-        //this.productList = [...res.data.productList];
         this.clientList = [...res.data.clientList];
-
-
       })
 
       //사무실 재고 불러오기
@@ -485,15 +479,18 @@ export default {
         //this.inventory = res.data;
         //this.category = '전체'
         this.productList = [...res.data];
-        console.log(this.productList)
+        //console.log(this.productList)
 
         //목록 가져 온 후 카테고리별로 목록 수정하게
-        this.category = '토너';
+        //this.category = '';
+        //this.category = '토너';
+        this.changeProductList();
       })
     },
 
     //카테고리별로 제품 목록 분류
     changeProductList() {
+      //this.filterList = [];
       var list = [];
 
       //현재 선택 중인 카테고리 목록만 분류
@@ -505,9 +502,9 @@ export default {
           list.push(this.productList[index])
         }
       }
-      console.log(list)
+      //console.log(list)
 
-      this.filterList = [...list]
+      this.filterList = list.slice();
     },
 
 
@@ -525,10 +522,12 @@ export default {
 
         //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
         this.releaseList.forEach(object => {
-
-          if (object.product == this.product.product && object.price == this.price) {
-            console.log(object.count)
-            console.log(this.count)
+          //console.log(object.id)
+          //console.log(this.product.id)
+          if (object.id == this.product.id && object.client == this.client) {
+            //if (object.product == this.product.product && object.price == this.price) {
+            // console.log(object.client)
+            // console.log(this.client)
             object.count = this.count * 1 + object.count * 1;
             exist = 1;
 
@@ -538,8 +537,9 @@ export default {
         //없는 품목이면 새로 추가
         if (exist != 1) {
           this.releaseList.push({
+            id: this.product.id,
             type: this.select,
-            category: this.category,
+            category: this.product.category,
             date: this.selectDate,
             client: this.client,
             product: this.product.product,
@@ -552,9 +552,11 @@ export default {
         //console.log(this.client)
 
         //사무실재고 보다 더 많이 나갈 수 없게 하기?
-        this.product.count = this.product.count - this.count
+        //filterlist는 productlist를 참조한 상태여서 filterlist값을 변경해도 같이 변경됨
+        //this.product.count = this.product.count - this.count
         this.filterList.forEach(object => {
-          if (object.product == this.product && object.price == this.price) {
+          //console.log(object.count + ' / ' + this.count)
+          if (object.id == this.product.id) {
             object.count = object.count * 1 - this.count * 1
           }
         })
@@ -570,20 +572,30 @@ export default {
 
     //초기화 버튼
     resetButton() {
-      this.getList()
+
 
       this.resetForm()
       this.resetList()
 
-      this.changeProductList()
-      this.isUpdating = true;
+      this.getList()
+      //this.changeProductList()
+      //this.isUpdating = true;
     },
 
     //목록 중 선택한 행만 제거
     deleteList(list) {
+
       this.releaseList.splice(this.releaseList.indexOf(list), 1)
       this.releasePrice -= (list.price * list.count)
 
+
+      //삭제한 만큼 원래 재고 수량에 다시 추가
+      this.filterList.forEach(object => {
+        //console.log(object.count + ' / ' + this.count)
+        if (object.id == list.id) {
+          object.count = object.count * 1 + list.count * 1
+        }
+      })
     }
 
   },
@@ -596,6 +608,4 @@ export default {
 
 }
 </script>
-<style>
-
-</style>
+<style></style>
