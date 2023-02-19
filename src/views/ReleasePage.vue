@@ -150,8 +150,8 @@
 
   <!-- 버튼 -->
   <v-card-actions>
-  <v-row>
-      <v-col cols="12" md="6">
+  <v-row class="justify-space-between mx-8">
+      <!-- <v-col cols="12" md="6"> -->
       <v-btn
           variant="flat"
           color="error"
@@ -159,9 +159,9 @@
       >
           초기화
       </v-btn>
-      </v-col>
+      <!-- </v-col>
 
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6"> -->
       <v-btn
           variant="flat"
           color="success"
@@ -170,7 +170,7 @@
           추가
           </v-btn>
           
-      </v-col>
+      <!-- </v-col> -->
       </v-row>
   </v-card-actions>
 

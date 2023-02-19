@@ -38,8 +38,10 @@
       >
       <v-container>
         <v-row>
+          <VueDatePicker v-model="date" :max-date="new Date()" show-now-button now-button-label="현재 날짜" ></VueDatePicker>
             <!-- 제품 선택 -->
             <v-col cols="12">
+              
             <v-autocomplete
               v-model="product"
               :loading="loading"
@@ -48,7 +50,7 @@
               :custom-filter="productFilter"
               variant="filled"
               color="blue-grey-lighten-2"
-              label="제품"
+              label="*제품"
               item-title="name"
               item-value="name"
               
@@ -64,16 +66,23 @@
             </v-autocomplete>
           </v-col>
 
-          <!-- 날짜선택 -->
-          <v-col cols="12" md="6">
+          <!-- 날짜선택 -->    <!--@click="showDate()"  -->
+          <!-- <v-col cols="12" md="6">
             <DatePicker v-model="date" @click="showDate()"  :max-date="new Date()" :data="masks"/>
-            <!--@click="showDate()"  -->
+           
             <p v-if="selectDate!='1970-01-01'">{{selectDate}}</p>
             <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
-          </v-col>
+
+            <VueDatePicker v-model="date" :max-date="new Date()" show-now-button now-button-label="현재 날짜" ></VueDatePicker>
+            <p>{{date}}</p>
+            <p>{{selectDate}}</p>
+          </v-col> -->
 
           <!-- 거래처 입력 -->
           <v-col cols="12" md="6">
+              
+            
+            
             <v-autocomplete
               v-model="client"
               :loading="loading"
@@ -119,6 +128,7 @@
           
           
         </v-row>
+
       </v-container>
     
 
@@ -126,8 +136,8 @@
 
     <!-- 버튼 -->
     <v-card-actions>
-    <v-row>
-        <v-col cols="12" md="6">
+    <v-row class=" justify-space-between mx-8">
+        <!-- <v-col cols="12" md="6"> -->
         <v-btn
             variant="flat"
             color="error"
@@ -135,9 +145,10 @@
         >
             초기화
         </v-btn>
-        </v-col>
-
-        <v-col cols="12" md="6">
+       
+        <!-- </v-col>
+          
+        <v-col cols="12" md="6"> -->
         <v-btn
             variant="flat"
             color="success"
@@ -146,7 +157,7 @@
             입력
             </v-btn>
             
-        </v-col>
+        <!-- </v-col> -->
         </v-row>
     </v-card-actions>
 
@@ -170,42 +181,51 @@
         </p>
 
 
-        </v-card-text>
-        </v-row>
-        <v-row justify="center">
-          <v-col cols="12" md="6">
-        
-        <!-- 입력값 전송 -->
-        <v-card-actions>
-          <v-btn color="success" block @click="[dialog = false, sendData()]">네</v-btn>
-        </v-card-actions>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card-actions>
-          <v-btn color="error" block @click="dialog = false">아니오</v-btn>
-        </v-card-actions>
-      </v-col>
-        </v-row>
-      </v-card>
-    </v-dialog>
+          </v-card-text>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="12" md="6">
+          
+          <!-- 입력값 전송 -->
+          <v-card-actions>
+            <v-btn color="success" block @click="dialog = false">네</v-btn>
+          </v-card-actions>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-card-actions>
+            <v-btn color="error" block @click="dialog = false">아니오</v-btn>
+          </v-card-actions>
+
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-dialog>
 
     </div>
 </template>
 <script>
-import { DatePicker } from 'v-calendar';
+//import { DatePicker } from 'v-calendar';
+
+///import { ref } from 'vue';
+
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 import 'v-calendar/dist/style.css';
 import axios from "axios";
 import { ip } from '../router/ip';
 
+//const test_date = ref(new Date());
 
 export default {
   components: {
-    DatePicker
+    //DatePicker,
+    VueDatePicker
   },
   data() {
     return {
       inline: null,
+      //date: null,
 
       //선택한 날짜 데이터 포맷
       date: new Date(),
@@ -260,10 +280,18 @@ export default {
       }
     },
 
+    date() {
+      this.selectDate = this.dateFormat(this.date)
+    }
   },
 
 
   methods: {
+
+    dateFormat(date) {
+
+      return new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(date)
+    },
 
     remove(item) {
       const index = this.friends.indexOf(item.name)
