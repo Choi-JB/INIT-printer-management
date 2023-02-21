@@ -1,32 +1,35 @@
 <template lang="">
+      
+
+
      <v-table
-    fixed-header
-    height="500px"
-  >
+      fixed-header
+      height="600px"
+    >
     <thead>
       <tr>
-        <th class="text-left">
+        <th class="text-center">
           구분
         </th>
-        <th class="text-left">
+        <th class="text-center">
           날짜
         </th>
-        <th class="text-left">
+        <th class="text-center">
           거래처
         </th>
-        <!-- <th class="text-left">
+        <th class="text-center">
           품목
-        </th> -->
-        <th class="text-left">
+        </th>
+        <th class="text-center">
           품명
         </th>
-        <th class="text-left">
+        <th class="text-center">
           단가
         </th>
-        <th class="text-left">
+        <th class="text-center">
           개수
         </th>
-        <th class="text-left">
+        <th class="text-center">
           총액
         </th>
       </tr>
@@ -35,15 +38,16 @@
       <tr
         v-for="item in history"
         :key="item"
+        class="text-center"
       >
         <td>{{ item.type }}</td>
         <td>{{ item.date }}</td>
         <td>{{ item.client }}</td>
-        <!-- <td>{{ item.category }}</td> -->
+        <td>{{ item.category }}</td>
         <td>{{ item.product }}</td>
-        <td>{{ item.price.toLocaleString('ko-KR') }}</td>
-        <td>{{ item.count }}</td>
-        <td>{{ item.total.toLocaleString('ko-KR') }}</td>
+        <td class="text-center">{{ item.price.toLocaleString('ko-KR') }}</td>
+        <td class="text-center">{{ item.count }}</td>
+        <td class="text-center">{{ item.total.toLocaleString('ko-KR') }}</td>
       </tr>
     </tbody>
   </v-table>

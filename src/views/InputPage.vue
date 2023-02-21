@@ -67,16 +67,24 @@
           </v-col>
 
           <!-- 날짜선택 -->    <!--@click="showDate()"  -->
-          <!-- <v-col cols="12" md="6">
-            <DatePicker v-model="date" @click="showDate()"  :max-date="new Date()" :data="masks"/>
-           
+          <v-col cols="12" md="6">
+            <DatePicker v-model="date" @click="showDate()" :update-on-input="false" :max-date="new Date()" :data="masks">
+              <template v-slot="{ inputValue, inputEvents }">
+                <input
+                  class="bg-white border px-2 py-1 rounded"
+                  :value="inputValue"
+                  v-on="inputEvents"
+                />
+              </template>
+            </DatePicker>
+
             <p v-if="selectDate!='1970-01-01'">{{selectDate}}</p>
             <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
 
             <VueDatePicker v-model="date" :max-date="new Date()" show-now-button now-button-label="현재 날짜" ></VueDatePicker>
             <p>{{date}}</p>
             <p>{{selectDate}}</p>
-          </v-col> -->
+          </v-col>
 
           <!-- 거래처 입력 -->
           <v-col cols="12" md="6">
@@ -204,7 +212,8 @@
     </div>
 </template>
 <script>
-//import { DatePicker } from 'v-calendar';
+import { DatePicker } from 'v-calendar';
+
 
 ///import { ref } from 'vue';
 
@@ -219,7 +228,7 @@ import { ip } from '../router/ip';
 
 export default {
   components: {
-    //DatePicker,
+    DatePicker,
     VueDatePicker
   },
   data() {

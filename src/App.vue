@@ -22,6 +22,20 @@
           </router-link>
           <v-divider></v-divider>
         </div>
+
+        <v-list-group value="Data">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="데이터 관리" prepend-icon="mdi-cog"></v-list-item>
+          </template>
+
+          <div v-for="([title, icon, link], i) in dataSettings" :key="i">
+            <router-link :to="link">
+              <v-list-item :title="title" :prepend-icon="icon" :value="title">
+              </v-list-item>
+            </router-link>
+          </div>
+        </v-list-group>
+
       </v-list>
     </v-navigation-drawer>
 
@@ -80,12 +94,12 @@ export default {
         title: "history",
         icon: "mdi-history",
       },
-      {
-        name: "관리 설정",
-        link: "./settings",
-        title: "settings",
-        icon: "mdi-cog",
-      },
+      // {
+      //   name: "데이터 관리",
+      //   link: "./setting",
+      //   title: "setting",
+      //   icon: "mdi-cog",
+      // },
       {
         name: "test page",
         link: "./input",
@@ -94,6 +108,10 @@ export default {
       }
     ],
 
+    dataSettings: [
+      ['제품 정보', '', "./product"],
+      ['거래처 정보', '', "./client"]
+    ]
     // icon :
   }),
 };

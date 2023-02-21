@@ -1,29 +1,24 @@
 <template lang="">
   <v-container>
     <!-- 출고/부품교체/판매 선택 -->
-    <v-radio-group
+    <v-btn-toggle
       v-model="select"
-      inline
+      color="deep-purple-accent-3"
+      variant="outlined"
+      group
+      class="my-3"
     >
-      <v-radio
-        label="출고"
-        value="출고"
-        color="primary"
-      ></v-radio>
-      <v-radio
-        label="판매"
-        value="판매"
-        color="primary"
-      ></v-radio>
-      <v-radio
-        label="직접사용"
-        value="직접사용"
-        color="primary"
-        unabled
-      ></v-radio>
-    </v-radio-group>
+      <v-btn value="출고" class="font-weight-black">
+        출고
+      </v-btn>
+      <v-btn value="판매" class="font-weight-black">
+        판매
+      </v-btn>
+      <v-btn value="직접사용" class="font-weight-black">
+        직접사용
+      </v-btn>
+    </v-btn-toggle>
 
-    <v-card>
 
     <!-- 유저 입력 영역 -->
     <v-form
@@ -35,154 +30,199 @@
 
       <v-row>
 
-        <!-- 날짜선택 -->
-        <v-col cols="12" md="4">
-          <DatePicker v-model="date" @click="showDate()"  :max-date="new Date()" :data="masks"/>
-          <p v-if="selectDate!='1970-01-01'">{{selectDate}}</p>
-          <p v-if="selectDate=='1970-01-01'">날짜를 선택해주세요!</p>
+        <!-- 현재 재고 목록 -->
+        <v-col cols="12" md="5">
+          <v-card variant="tonal" color="teal" height="450px">
+            
+            <p class="mx-5 my-5 text-center font-weight-black">사무실 {{this.category}} 재고</p>
+            <v-table>
+              <thead>
+                <th class="text-center">
+                  품목
+                </th>
+                <th class="text-center">
+                  수량
+                </th>
+              </thead>
+              
+              <tbody>
+                <v-scroll-y-transition group="true">
+                <tr
+                  v-for="list in inventory2"
+                  :key="list"
+                >
+                  <td class="text-center">{{list.product}}</td>
+                  <td class="text-center">{{list.count}}</td>
+                </tr>
+                </v-scroll-y-transition>
+              </tbody>
+              
+            </v-table>
+            
+          </v-card> 
         </v-col>
 
         
-        <v-col cols="12" md="6">
+        <!-- 입력창 -->
+        <v-col cols="12" md="7">
+          <v-card variant="outlined" color="teal" max-width="500px" height="450px">
 
-           <!-- 거래처 입력 -->
-          <v-autocomplete
-            v-model="client"
-            :loading="loading"
-            :disabled="isEditing"
-            :items="clientList"
-            
-            variant="filled"
-            color="blue-grey-lighten-2"
-            label="*거래처"
-            item-title="name"
-            item-value="name"
-            
-          >
-          <template v-slot:item="{ props, item }">
-              <v-list-item
-                v-bind="props"
-                :title="item?.raw?.name"
-              ></v-list-item>
-            </template>
-          </v-autocomplete>
+             <!-- 날짜 선택 -->
+            <v-row class="mx-5 my-2">
+              <v-col cols="12" md="3">
+                <p class="font-weight-black FontSize">입력창</p>  
+              </v-col>
+              <v-col cols="12" md="9" class="text-right">
+                <DatePicker v-model="date" @click="showDate()" :update-on-input="false" :max-date="new Date()" :data="masks">
+                  <template v-slot="{ inputValue, inputEvents }">
+                    <input
+                      class="bg-white border px-2 py-1 rounded"
+                      :value="inputValue"
+                      v-on="inputEvents"
+                    />
+                  </template>
+                </DatePicker>
+            </v-col>
+            </v-row>  
 
-     <!-- 카테고리 선택창 -->
-    <v-radio-group
-      v-model="category"
-      inline
-    >
-      <v-radio
-        label="토너"
-        value="토너"
-        color="primary"
-      ></v-radio>
-      <v-radio
-        label="부품"
-        value="부품"
-        color="primary"
-      ></v-radio>
-      <v-radio
-        label="프린터"
-        value="프린터"
-        color="primary"
-      ></v-radio>
-      <v-radio
-        label="복합기"
-        value="복합기"
-        color="primary"
-      ></v-radio>
-    </v-radio-group>
+             <!-- 카테고리 선택창 -->
+            <v-row class="mx-5 mb-n10">
+                
+                 <v-btn-toggle
+                    v-model="category"
+                    color="blue"
+                    group
+                    class="mb-8"
+                    variant="outlined"
+                  >
+                    <v-btn value="토너" class="font-weight-black">
+                      토너
+                    </v-btn>
+                    <v-btn value="부품" class="font-weight-black">
+                      부품
+                    </v-btn>
+                    <v-btn value="프린터" class="font-weight-black">
+                      프린터
+                    </v-btn>
+                    <v-btn value="복합기" class="font-weight-black">
+                      복합기
+                    </v-btn>
+                  </v-btn-toggle>
+            </v-row>
+             <v-row class="mx-2 mb-n6">
 
-            <!-- 제품 선택 -->         <!-- :menu-props="{maxHeight:300} 메뉴리스트 길이조절" -->
-            <v-autocomplete
-            v-model="product"
-            :items="filterList"
-            :disabled="isUpdating"
-            color="blue-grey-lighten-2"
-            label="*제품"
-            
-            item-title="product"
-            item-value="item"
+                    <v-col cols="12" md="9">
+                        <!-- 제품 선택 -->        
+                        <v-autocomplete
+                        v-model="product"
+                        :items="filterList"
+                        
+                        color="blue-grey-lighten-2"
+                        label="*제품"
+                        
+                        item-title="product"
+                        item-value="item"
 
-            return-object
+                        return-object  
+                        style = "max-width:400px;"
+                        :menu-props="{ maxHeight: 300 }"
+                      >
+                      <template v-slot:item="{ props, item }">
+                          <v-list-item
+                            v-bind="props"
+                            :title="item?.raw?.product"
+                            :subtitle="item?.raw?.price + '원 / 남은 재고 : '+ item?.raw?.count"
+                          ></v-list-item>
+                      </template>
 
-            :menu-props="{ maxHeight: 300 }"
-          >
-          
-          <template v-slot:item="{ props, item }">
-              <v-list-item
-                v-bind="props"
-                :title="item?.raw?.product"
-                :subtitle="item?.raw?.price+'원 / 남은 재고 : '+item?.raw?.count"
-              ></v-list-item>
-          </template>
-        </v-autocomplete>
+                    </v-autocomplete>
+                    </v-col>
 
+                    <v-col cols="12" md="3">
+                      <!-- 수량 입력 -->
+                      <v-text-field
+                        v-model="count"
+                        type="number"
+                        :disabled="isUpdating"
+                        color="blue-grey-lighten-2"
+                        label="*수량"
+                      ></v-text-field>
+                    </v-col>
+                </v-row>
 
-           <!-- 개수 입력 -->
-          <v-text-field
-            v-model="count"
-            type="number"
-            :disabled="!countValid"
-            color="blue-grey-lighten-2"
-            :label="product ? ('사무실 남은 재고 : ' + product.count) : '*개수'"
-            :rules="count_rule"
+                <v-row class="mx-5">
+                  <!-- 거래처 입력 -->
+                  <v-autocomplete
+                    v-model="client"
+                    :loading="loading"
+                    :disabled="isEditing"
+                    :items="clientList"
+                    
+                    variant="filled"
+                    color="blue-grey-lighten-2"
+                    label="*거래처"
+                    item-title="name"
+                    item-value="name"
+                    
+                  >
+                  <template v-slot:item="{ props, item }">
+                      <v-list-item
+                        v-bind="props"
+                        :title="item?.raw?.name"
+                      ></v-list-item>
+                    </template>
+                  </v-autocomplete>
+                </v-row>
 
-          ></v-text-field>
+                <v-row class="mx-5">
+                  <!-- 단가 입력 -->
+                  <v-text-field
+                    v-model="price"
+                    type="number"
+                    :disabled="isUpdating"
+                    color="blue-grey-lighten-2"
+                    label="단가 (단위 : 원￦)"
+                    :rules="price_rule"
+                  ></v-text-field>
+                </v-row>
 
+                  <!-- 버튼 -->
+                  <v-card-actions>
+                    <v-row class="justify-space-between mx-3">    <!-- justify-space-between 양옆으로 정렬 / mx-8 마진 양옆으로 8 -->
+                      <!-- <v-col cols="12" md="6"> -->
+                      <v-btn
+                          variant="flat"
+                          color="error"
+                          @click="resetButton()"
+                      >
+                          초기화
+                      </v-btn>
+                      <!-- </v-col>
 
-          <!-- 단가 입력 -->
-          <v-text-field
-            v-model="price"
-            type="number"
-            :disabled="isUpdating"
-            color="blue-grey-lighten-2"
-            label="단가 (단위 : 원￦)"
-            :rules="price_rule"
-  
-          ></v-text-field>
+                      <v-col cols="12" md="6"> -->
+                      <v-btn
+                          variant="flat"
+                          color="success"
+                          @click="addList()"
+                      >
+                          추가
+                          </v-btn>
+                          
+                      <!-- </v-col> -->
+                    </v-row>
+                  </v-card-actions>
+          </v-card>
         </v-col>
-        
       </v-row>
-
-  <v-divider />
-
-  <!-- 버튼 -->
-  <v-card-actions>
-  <v-row class="justify-space-between mx-8">
-      <!-- <v-col cols="12" md="6"> -->
-      <v-btn
-          variant="flat"
-          color="error"
-          @click="resetButton()"
-      >
-          초기화
-      </v-btn>
-      <!-- </v-col>
-
-      <v-col cols="12" md="6"> -->
-      <v-btn
-          variant="flat"
-          color="success"
-          @click="addList()"
-      >
-          추가
-          </v-btn>
-          
-      <!-- </v-col> -->
-      </v-row>
-  </v-card-actions>
-
   </v-form>
-  </v-card>
 
- <!-- 입력 완료 재확인 창 -->
+ <!--------- 입력 완료 재확인 창 ------------->
 <v-dialog 
     v-model="dialog"
     persistent
     absolute
     transition="dialog-bottom-transition"
+    max-width="700px"
   >
     <v-card>
       <v-row justify="center">
@@ -205,11 +245,15 @@
     </v-card>
   </v-dialog>
 
-  <!-- 출고/수리/판매 목록 -->
-  <v-card>
-   <v-table
+  
+<!--------------------------  -->
+  <v-divider class="my-5" />
+<!--------------------------  -->
 
-  >
+
+  <!-- 출고/수리/판매 목록 -->
+  <v-card variant="outlined" color="blue" max-width="1000px">
+   <v-table>
     <thead >
       
       <tr class="table-head">
@@ -226,7 +270,7 @@
           단가
         </th>
         <th class="text-center">
-          개수
+          수량
         </th>
         <th class="text-center">
           금액
@@ -248,10 +292,10 @@
         <td class="text-center">{{list.product}}</td>
         
         <!-- 문자로 인식해서 x1 해서 숫자처리 -->
-        <td class="text-right">{{(list.price * 1).toLocaleString('ko-KR')}} 원</td>  
+        <td class="text-center">{{(list.price * 1).toLocaleString('ko-KR')}} 원</td>  
         <td class="text-center">{{list.count}}</td>
-        <td lass="text-right">{{(list.price * list.count).toLocaleString('ko-KR')}} 원</td>
-        <td lass="text-right"><v-icon icon="mdi-delete"
+        <td lass="text-center">{{(list.price * list.count).toLocaleString('ko-KR')}} 원</td>
+        <td lass="text-left"><v-icon icon="mdi-delete"
               
               @click="deleteList(list)"
           ></v-icon></td>
@@ -275,8 +319,9 @@
   </v-card>
 
 
-</v-container>
+  </v-container>
 </template>
+
 <script>
 import { DatePicker } from 'v-calendar';
 
@@ -348,6 +393,8 @@ export default {
       releaseList: [],
       releasePrice: 0,
 
+      //사무실재고
+      inventory2: []
     }
   },
 
@@ -363,6 +410,7 @@ export default {
     category() {
       // console.log("현재 카테고리 : " + this.category)
       this.changeProductList()
+      this.changeInventoryList()
       //this.resetForm()    제품쪽만 초기화
       this.product = null;
     },
@@ -383,6 +431,10 @@ export default {
           this.count = this.product.count
           //alert('사무실 재고보다 많은 수량을 입력할 수 없습니다!')
         }
+        //수량 0이나 음수 사용 못하게
+        if (this.count <= 0) {
+          this.count = 1
+        }
       }
     },
 
@@ -400,11 +452,20 @@ export default {
         this.isEditing = null;
         //console.log(this.client)
       }
+    },
+
+    date() {
+      this.selectDate = this.dateFormat(this.date)
     }
   },
 
 
   methods: {
+
+    dateFormat(date) {
+      return new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(date)
+    },
+
     //밑에 두 함수는 필요한가??
     remove(item) {
       const index = this.friends.indexOf(item.name)
@@ -425,6 +486,7 @@ export default {
       this.product = null
       this.count = 1
       this.price = null
+      this.date = new Date()
       this.selectDate = new Intl.DateTimeFormat('fr-ca', { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     },
 
@@ -485,6 +547,7 @@ export default {
         //this.category = '';
         //this.category = '토너';
         this.changeProductList();
+        this.changeInventoryList();
       })
     },
 
@@ -505,6 +568,20 @@ export default {
       //console.log(list)
 
       this.filterList = list.slice();
+    },
+
+    //카테고리별로 사무실 재고 목록 변경
+    changeInventoryList() {
+      var list = [];
+
+      //현재 선택 중인 카테고리 목록만 분류
+      for (var index in this.productList) {
+        if (this.category == this.productList[index].category) {
+          list.push(this.productList[index])
+        }
+      }
+      console.log(list)
+      this.inventory2 = [...list]
     },
 
 
@@ -572,11 +649,8 @@ export default {
 
     //초기화 버튼
     resetButton() {
-
-
       this.resetForm()
       this.resetList()
-
       this.getList()
       //this.changeProductList()
       //this.isUpdating = true;
