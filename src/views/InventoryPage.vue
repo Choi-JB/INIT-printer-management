@@ -31,7 +31,7 @@
     <v-card variant="outlined" color="blue" max-width="800px">
      <v-table
       fixed-header
-      max-height="600px"
+      height="600px"
     >
       <thead>
         <tr>

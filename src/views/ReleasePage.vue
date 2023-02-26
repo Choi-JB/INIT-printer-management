@@ -35,7 +35,7 @@
           <v-card variant="tonal" color="teal" height="450px">
             
             <p class="mx-5 my-5 text-center font-weight-black">사무실 {{this.category}} 재고</p>
-            <v-table>
+            <v-table fixed-header height="350px">
               <thead>
                 <th class="text-center">
                   품목

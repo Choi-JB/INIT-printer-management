@@ -11,6 +11,7 @@ import Input from "../views/InputPage";
 import InventoryPage from "../views/InventoryPage";
 import ProductDataPage from "../views/ProductDataPage";
 import ClientDataPage from "../views/ClientDataPage";
+import ContractDataPage from "../views/ContractDataPage";
 
 // 라우터 설계
 const routes = [
@@ -25,6 +26,7 @@ const routes = [
   { path: "/inventory", component: InventoryPage },
   { path: "/product", component: ProductDataPage },
   { path: "/client", component: ClientDataPage },
+  { path: "/contract", component: ContractDataPage },
 ];
 
 // 라우터 생성

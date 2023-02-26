@@ -28,10 +28,10 @@
         <!-- 현재 재고 목록 -->
         <v-col cols="12" md="5">
           
-          <v-card variant="tonal" color="teal" height="450px">
+          <v-card variant="tonal" color="teal" max-height="450px">
             
             <p class="mx-5 my-5 text-center font-weight-black">사무실 {{this.category}} 재고</p>
-            <v-table>
+            <v-table fixed-header height="350px">
               <thead>
                 <th class="text-center">
                   품목
@@ -41,7 +41,7 @@
                 </th>
               </thead>
               
-              <tbody>
+              <tbody >
                 <v-scroll-y-transition group="true">
                 <tr
                   v-for="list in inventory2"
@@ -63,9 +63,10 @@
 
 
 
-        <!-- 입력창 -->
+<!------------- 입력창 -------------------------->
         <v-col cols="12" md="7">
-          <v-card  variant="outlined" color="teal" max-width="500px" height="450px">
+          <v-card  variant="outlined" color="teal" max-width="500px" max-height="700px">
+            <v-form ref="form">
 
             <!-- 날짜 선택 -->
             <v-row class="mx-5 mt-3">
@@ -118,9 +119,9 @@
                         <v-autocomplete
                         v-model="product"
                         :items="filterList"
-                        
+
                         color="blue-grey-lighten-2"
-                        label="*제품"
+                        label="제품*"
                         
                         item-title="name"
                         item-value="item"
@@ -145,6 +146,7 @@
                       <v-text-field
                         v-model="count"
                         type="number"
+                        :rules="price_rule"
                         :disabled="isUpdating"
                         color="blue-grey-lighten-2"
                         label="*수량"
@@ -162,7 +164,7 @@
                       :loading="loading"
                       :disabled="isUpdating"
                       :items="clientList"
-                      
+
                       variant="filled"
                       color="blue-grey-lighten-2"
                       label="*거래처"
@@ -183,10 +185,10 @@
                   <v-text-field
                     v-model="price"
                     type="number"
+                    :rules="price_rule"
                     :disabled="isUpdating"
                     color="blue-grey-lighten-2"
                     label="단가 (단위 : 원￦)"
-                    :rules="price_rule"
                   ></v-text-field>
                 </v-row>
 
@@ -212,7 +214,7 @@
                           
                     </v-row>
                   </v-card-actions>
-
+            </v-form>
         </v-card>
       </v-col>
     </v-row>
@@ -339,10 +341,9 @@
 </v-container>
 </template>
 <script>
-import '@vuepic/vue-datepicker/dist/main.css'
 import { DatePicker } from 'v-calendar';
-
 import 'v-calendar/dist/style.css';
+
 import axios from "axios";
 import { ip } from '../router/ip';
 
@@ -353,6 +354,8 @@ export default {
   },
   data() {
     return {
+      valid: true,
+
       category: '토너',
 
       //선택한 날짜 데이터 포맷
@@ -375,18 +378,22 @@ export default {
 
       //거래처
       client: null,
-      client_rule: [
-        v => !!v || '거래처는 필수 입력사항입니다.',
-
-      ],
       clientList: [],
+
+      //입력창 규칙
+      text_rule: [
+        v => !!v || '필수 입력 값 입니다!',
+        v => (v && v.length <= 20) || '20자를 초과할 수 없습니다',
+      ],
+
 
       //수량, 단가
       count: 1,
+
       price: null,
       price_rule: [
-        v => !(v == 0) || '단가를 확인해 주세요.'
-
+        v => !!v || '필수 입력 값 입니다!',
+        v => (v && v * 1 > 0) || '양수만 입력 가능!',
       ],
 
       //매입한 물품 리스트
@@ -454,11 +461,11 @@ export default {
       const index = this.friends.indexOf(item.name)
       if (index >= 0) this.friends.splice(index, 1)
     },
-    async validate() {
-      const { valid } = await this.$refs.form.validate()
+    // async validate() {
+    //   const { valid } = await this.$refs.form.validate()
 
-      if (valid) alert('Form is valid')
-    },
+    //   if (valid) alert('Form is valid')
+    // },
     //입력폼 모두 초기화
     reset() {
       //this.$refs.form.reset()
@@ -498,6 +505,7 @@ export default {
           alert(err);
         }).finally(() => {
           //console.log("항상 마지막에 실행");
+          //console.log('이거 실행됨?')
           this.getList()
           this.getInventory()
           this.reset()
@@ -540,12 +548,14 @@ export default {
 
     //매입목록에 추가
     addList() {
+
       if (this.product == null || this.client == null || this.count == null || this.price == null) {
         alert('입력값을 채워주세요!')
       } else if (this.purchaseList.length >= 5) {
         alert('한번에 5개까지만 입력가능합니다!')
       }
       else {
+
         let exist = -1;
 
         //만약 목록에 있는 품목이면 목록에 있는 품목의 수량만 증가
@@ -575,6 +585,7 @@ export default {
         this.purchasePrice += this.count * this.price
         console.log(this.purchasePrice)
       }
+
     },
     //매입목록 초기화
     resetList() {

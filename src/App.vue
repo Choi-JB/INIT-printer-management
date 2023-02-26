@@ -110,7 +110,8 @@ export default {
 
     dataSettings: [
       ['제품 정보', '', "./product"],
-      ['거래처 정보', '', "./client"]
+      ['거래처 정보', '', "./client"],
+      ['임대 계약 정보', '', '/contract']
     ]
     // icon :
   }),
