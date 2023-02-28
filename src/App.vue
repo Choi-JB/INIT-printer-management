@@ -100,12 +100,12 @@ export default {
       //   title: "setting",
       //   icon: "mdi-cog",
       // },
-      {
-        name: "test page",
-        link: "./input",
-        title: "input",
-        icon: "mdi-cog",
-      }
+      // {
+      //   name: "test page",
+      //   link: "./input",
+      //   title: "input",
+      //   icon: "mdi-cog",
+      // }
     ],
 
     dataSettings: [

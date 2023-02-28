@@ -30,7 +30,7 @@
             color="success"
             size="large"
             class="float-right"
-            @click="addDialog=true"
+            @click="[addDialog=true, this.addCategory=this.category]"
          >
                추가
             </v-btn>
