@@ -260,6 +260,9 @@
         <th  class="text-center">
           번호
         </th>
+        <th  class="text-center">
+          일자
+        </th>
         <th class="text-center">
           거래처
         </th>
@@ -288,6 +291,7 @@
         :key="list" 
       >
         <td class="text-center">{{releaseList.indexOf(list)+1}}</td>
+        <td class="text-center">{{list.date}}</td>
         <td class="text-center">{{list.client}}</td>
         <td class="text-center">{{list.product}}</td>
         
@@ -385,8 +389,8 @@ export default {
 
       price: null,
       price_rule: [
-        v => !(v == '') || '단가를 확인해 주세요.'
-
+        v => !!v || '필수 입력 값 입니다!',
+        v => (v && v * 1 > 0) || '양수만 입력 가능!',
       ],
 
       // 출고/판매 예정 물품 리스트
@@ -599,12 +603,9 @@ export default {
 
         //만약 목록에 있는 품목이면 개수만 있는 목록의 개수만 증가
         this.releaseList.forEach(object => {
-          //console.log(object.id)
-          //console.log(this.product.id)
-          if (object.id == this.product.id && object.client == this.client) {
-            //if (object.product == this.product.product && object.price == this.price) {
-            // console.log(object.client)
-            // console.log(this.client)
+
+          if (object.date == this.selectDate && object.product == this.product.product && object.client == this.client && object.price == this.price) {
+
             object.count = this.count * 1 + object.count * 1;
             exist = 1;
 

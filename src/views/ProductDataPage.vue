@@ -274,13 +274,13 @@ export default {
          editMfr: 'kyocera',
          editName: null,
          editPrice: null,
-         editNote: null,
+         editNote: ' ',
 
          addCategory: null,
          addMfr: 'kyocera',
          addName: null,
          addPrice: null,
-         addNote: null,
+         addNote: ' ',
 
          textRule: [
             v => !!v || '필수 입력 값 입니다!',
@@ -288,7 +288,7 @@ export default {
          ],
          priceRule: [
             v => !!v || '필수 입력 값 입니다!',
-            v => (v && v * 1 > 0) || '양수만 입력 가능!',
+            v => (v && v * 1 >= 0) || '양수만 입력 가능!',
          ]
       }
    },
@@ -441,13 +441,13 @@ export default {
          this.editMfr = 'kyocera'
          this.editName = null
          this.editPrice = null
-         this.editNote = null
+         this.editNote = ' '
 
          this.addCategory = null
          this.addMfr = 'kyocera'
          this.addName = null
          this.addPrice = null
-         this.addNote = null
+         this.addNote = ' '
       }
    },
 

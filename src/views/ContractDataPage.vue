@@ -683,7 +683,7 @@ export default {
             category: '',
             product: '',
             count: 1,
-            note: '',
+            note: ' ',
 
             client: [],
             clientList: [],

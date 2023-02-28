@@ -264,6 +264,9 @@
         <th  class="text-center">
           번호
         </th>
+        <th  class="text-center">
+          일자
+        </th>
         <th class="text-center">
           거래처
         </th>
@@ -293,6 +296,7 @@
         :key="list" 
       >
         <td class="text-center">{{purchaseList.indexOf(list)+1}}</td>
+        <td class="text-center">{{list.date}}</td>
         <td class="text-center">{{list.client}}</td>
         <td class="text-center">{{list.product}}</td>
         
@@ -561,9 +565,8 @@ export default {
         //만약 목록에 있는 품목이면 목록에 있는 품목의 수량만 증가
         this.purchaseList.forEach(object => {
 
-          if (object.product === this.product.name && object.price === this.price) {
-            console.log(object.count)
-            console.log(this.count)
+          if (object.date == this.selectDate && object.product == this.product.name && object.client == this.client && object.price == this.price) {
+
             object.count = this.count * 1 + object.count * 1;
             exist = 1;
 

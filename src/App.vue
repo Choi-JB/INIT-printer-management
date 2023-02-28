@@ -6,7 +6,7 @@
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>임대 통계 프로그렘(가제)</v-app-bar-title>
+      <v-app-bar-title>INIT 임대 관리</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn icon="mdi-dots-vertical"></v-btn>

@@ -268,15 +268,15 @@ export default {
 
          editCategory: null,
          editName: null,
-         editAddress: '',
-         editPhone: '',
-         editNote: '',
+         editAddress: ' ',
+         editPhone: ' ',
+         editNote: ' ',
 
          addCategory: null,
          addName: null,
-         addAddress: '',
-         addPhone: '',
-         addNote: '',
+         addAddress: ' ',
+         addPhone: ' ',
+         addNote: ' ',
 
          textRule: [
             v => !!v || '필수 입력 값 입니다!',
@@ -431,15 +431,15 @@ export default {
 
          this.editCategory = null
          this.editName = null
-         this.editAddress = null
-         this.editPhone = null
-         this.editNote = null
+         this.editAddress = ' '
+         this.editPhone = ' '
+         this.editNote = ' '
 
          this.addCategory = null
          this.addName = null
-         this.addAddress = null
-         this.addPhone = null
-         this.addNote = null
+         this.addAddress = ' '
+         this.addPhone = ' '
+         this.addNote = ' '
       }
    },
 
