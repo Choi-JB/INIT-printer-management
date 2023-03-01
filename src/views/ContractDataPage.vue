@@ -341,6 +341,7 @@
     <v-dialog
       v-model="editDialog"
       persistent
+      max-width="900"
     >
         <v-card>
             <v-toolbar
@@ -355,8 +356,10 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <v-toolbar-title>{{this.editClientName}} 계약 수정</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-checkbox v-model="isDelete" label="계약 삭제" ></v-checkbox>
+                    <!-- <v-spacer></v-spacer> -->
+                    <v-toolbar-items>
+                         <v-checkbox v-model="isDelete" label="계약 삭제" ></v-checkbox>
+                     </v-toolbar-items>    
                     <v-toolbar-items>
                         <v-btn
                         v-if="isDelete"
@@ -377,7 +380,9 @@
             </v-toolbar>
             <v-container>
                 <v-row>
-                    <v-table>
+                    <v-table
+                        max-height="200px"
+                    >
                         <thead>
                             <tr >
                                 <th >

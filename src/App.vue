@@ -76,12 +76,7 @@ export default {
         title: "release",
         icon: "mdi-printer",
       },
-      // {
-      //   name: "판매",
-      //   link: "./sale",
-      //   title: "sale",
-      //   icon: "mdi-cash",
-      // },
+
       {
         name: "사무실 재고",
         link: "./inventory",
@@ -100,12 +95,7 @@ export default {
       //   title: "setting",
       //   icon: "mdi-cog",
       // },
-      // {
-      //   name: "test page",
-      //   link: "./input",
-      //   title: "input",
-      //   icon: "mdi-cog",
-      // }
+
     ],
 
     dataSettings: [
