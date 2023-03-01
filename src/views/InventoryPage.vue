@@ -71,7 +71,8 @@
 </template>
 <script>
 import axios from "axios";
-import { ip } from '../router/ip';
+//import axios from "../plugins/AxiosInst"
+import { ip } from '../router/ip'
 
 export default {
   data() {
@@ -84,8 +85,9 @@ export default {
   methods: {
     //사무실 재고 목록 불러오기
     getInventory() {
+      console.log('get')
       axios.get(ip + "/inventory").then((res) => {
-        console.log(res.data)
+        //console.log(res.data)
         this.inventory = res.data;
         this.category = '전체'
       })
