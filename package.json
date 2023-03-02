@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 8077",
+    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -13,6 +13,7 @@
     "axios": "^1.2.2",
     "chart.js": "^4.1.1",
     "core-js": "^3.8.3",
+    "material-design-icons-iconfont": "^6.7.0",
     "roboto-fontface": "*",
     "v-calendar": "^3.0.0-alpha.8",
     "vue": "^3.2.13",

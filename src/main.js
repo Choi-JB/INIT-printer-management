@@ -1,14 +1,11 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
-
+import { createApp } from "vue";
+import App from "./App.vue";
+import vuetify from "./plugins/vuetify";
+import { loadFonts } from "./plugins/webfontloader";
+import "material-design-icons-iconfont/dist/material-design-icons.css";
 // 생성한 뷰 라우터 받아오기
-import { router } from './router/index.js'
+import { router } from "./router/index.js";
 
-loadFonts()
+loadFonts();
 
-createApp(App)
-  .use(vuetify)
-  .use(router)
-  .mount('#app')
+createApp(App).use(vuetify).use(router).mount("#app");

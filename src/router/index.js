@@ -1,6 +1,7 @@
 import {
   createRouter,
-  createWebHistory /*createMemoryHistory,*/,
+  createWebHashHistory,
+  //createWebHistory /*createMemoryHistory,*/,
 } from "vue-router";
 
 // 연결할 각 컴포넌트 import (src/views폴더 아래 컴포넌트들 생성해둠)
@@ -34,10 +35,10 @@ const routes = [
 
 // 라우터 생성
 const router = createRouter({
-  history: createWebHistory(),
-  //history: createMemoryHistory(process.env.BASE_URL),
+  //history: createWebHistory(),
+  history: createWebHashHistory(process.env.BASE_URL), //build 시 hash 모드 필요
   // mode: "history",
-  // base: process.env.BASE_URL,
+  //base: process.env.BASE_URL,
   routes,
 });
 

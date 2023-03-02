@@ -534,7 +534,7 @@ export default {
       //this.filterList = []
 
       //고객 거래처만 불러오기
-      axios.get(ip + `/list?data=${encodeURIComponent('고객')}`).then((res) => {
+      axios.get(ip + '/list', { params: { type: '고객' } }).then((res) => {
 
         this.clientList = [...res.data.clientList];
       })

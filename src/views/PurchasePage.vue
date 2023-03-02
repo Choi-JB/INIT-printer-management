@@ -519,7 +519,7 @@ export default {
 
     //상품리스트, 거래처 리스트 가져오기
     getList() {
-      axios.get(ip + `/list?data=${encodeURIComponent('매입')}`).then((res) => {
+      axios.get(ip + '/list', { params: { type: '매입' } }).then((res) => {
 
         this.productList = [...res.data.productList];
         this.clientList = [...res.data.clientList];
