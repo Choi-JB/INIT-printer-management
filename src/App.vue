@@ -3,7 +3,7 @@
     <!-- header 부분 -->
     <v-app-bar :elevation="5" name="app-bar" class="justify-center" color="grey-lighten-4">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="rail = !rail"></v-app-bar-nav-icon>
       </template>
 
       <v-app-bar-title>INIT 임대 관리</v-app-bar-title>
@@ -14,7 +14,7 @@
     </v-app-bar>
 
     <!-- 좌측 메뉴 nav bar -->
-    <v-navigation-drawer permanent>
+    <v-navigation-drawer v-model="drawer" :rail="rail" permanent>
       <v-list density="compact" nav>
         <div v-for="(a, i) in menu" :key="i">
           <router-link :to="menu[i].link">
@@ -25,7 +25,7 @@
 
         <v-list-group value="Data">
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="데이터 관리" prepend-icon="mdi-cog"></v-list-item>
+            <v-list-item v-bind="props" title="데이터 관리" prepend-icon="mdi-cog" @click="rail = false"></v-list-item>
           </template>
 
           <div v-for="([title, icon, link], i) in dataSettings" :key="i">
@@ -56,6 +56,8 @@ export default {
   components: {},
 
   data: () => ({
+    drawer: true,
+    rail: false,
     menu: [
       {
         //좌측 메뉴 목록

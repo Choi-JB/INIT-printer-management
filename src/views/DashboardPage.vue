@@ -11,8 +11,8 @@
           group
           class="my-3"
         >
-          <v-btn value="임대수입" class="font-weight-black">
-            임대 수입
+          <v-btn value="수입" class="font-weight-black">
+            수입
           </v-btn>
           <v-btn value="매입" class="font-weight-black">
             매입
@@ -71,10 +71,10 @@
     <!-- 표 , 차트 부분 -->
     <v-row>
       <v-col cols="12" md="6">
-        <v-table v-if="this.select=='임대수입'">
+        <v-table v-if="this.select=='수입'">
           <thead>
             <th> </th>
-            <th>수익</th>
+            <th>임대료수입</th>
             <th>지출</th>
             <th>이익</th>
           </thead>
@@ -100,11 +100,12 @@
               <td class="text-center">{{(this.rentTotal*1 - this.outTotal).toLocaleString('ko-KR')}}</td>
             </tr>
             <tr>
-              <td class="text-center" colspan="2">
-                월 평균 지출비용
+              <td class="text-center">
+                월 평균
               </td>
+              <td class="text-center">{{Math.ceil(this.rentAverage).toLocaleString('ko-KR')}}</td>
               <td class="text-center">{{Math.ceil(this.outAverage).toLocaleString('ko-KR')}}</td>
-              <td class="text-center"></td>
+              <td class="text-center">{{Math.ceil(this.rentAverage - this.outAverage).toLocaleString('ko-KR')}}</td>
             </tr>
           </tbody>
         </v-table>
@@ -224,7 +225,7 @@ export default {
 
       year: new Date().getFullYear(),
 
-      select: '임대수입',
+      select: '수입',
       type: '출고',
 
       //id, name
@@ -241,6 +242,9 @@ export default {
       rentTotal: 0,
       //지출 합계
       outTotal: 0,
+
+      //월 평균 수익
+      rentAverage: 0,
       //월 평균 지출
       outAverage: 0,
 
@@ -269,7 +273,7 @@ export default {
 
     //임대 수입 데이터 가져오기
     getBenefitData() {
-      axios.get(ip + `/dashboard`, { params: { client: this.client.name, year: this.year, type: this.type } }).then((res) => {
+      axios.get(ip + `/dashboard`, { params: { client_ID: this.client.id, client: this.client.name, year: this.year, type: this.type } }).then((res) => {
         //console.log(res.data);
         let data = res.data
         let list = []
@@ -294,6 +298,7 @@ export default {
           }
         }
 
+        this.rentAverage = rent / valid;
         this.outAverage = out / valid;
         this.rentTotal = rent;
         this.outTotal = out;
@@ -388,7 +393,7 @@ export default {
       this.purchaseAverage = 0
 
 
-      if (this.select == '임대수입') {
+      if (this.select == '수입') {
         this.getBenefitData()
       } else if (this.select == '매입') {
         this.getPurchaseData()
@@ -401,7 +406,7 @@ export default {
     //거래처 변경할때마다 통계 데이터 가져오기
     client() {
       this.isUpdating = true;
-      if (this.select == '임대수입') {
+      if (this.select == '수입') {
         this.getBenefitData()
       } else if (this.select == '매입') {
         this.getPurchaseData()
@@ -415,7 +420,7 @@ export default {
     //항목 변경 때마다 거래처 목록 변경
     select() {
       this.getClientList()
-      if (this.select == '임대수입') {
+      if (this.select == '수입') {
         this.type = '출고'
         this.client = { id: 0, name: '통합' }
       } else if (this.select == '매입') {
